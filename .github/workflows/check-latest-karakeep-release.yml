@@ -1,0 +1,85 @@
+name: Check the latest Karakeep release
+
+on:
+  schedule:
+    - cron: '15 */8 * * *'  # Run every 8 hours at 15 minutes past the hour
+
+jobs:
+  check-release:
+    runs-on: ubuntu-latest
+    env: 
+      CI_COMMIT_AUTHOR: github-actions[bot]
+      CI_COMMIT_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get current release version
+        run: echo "CURRENT_VERSION=$(grep 'KARAKEEP_VERSION:' Taskfile.yml | cut -d ' ' -f4)" >> $GITHUB_ENV
+
+      - name: Get latest release version
+        run: |
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/karakeep-app/karakeep/releases/latest | jq -r .tag_name)
+          if [[ "$LATEST_VERSION" == "null" ]]; then
+            echo "LATEST_VERSION=${{ env.CURRENT_VERSION }}" >> $GITHUB_ENV
+          else
+            echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
+          fi
+
+      - name: Check if there is a new release
+        run: |
+          if [[ "${{ env.LATEST_VERSION }}" != "${{ env.CURRENT_VERSION }}" ]]; then
+            echo "NEW_RELEASE=true" >> $GITHUB_ENV
+          else
+            echo "NEW_RELEASE=false" >> $GITHUB_ENV
+          fi
+      
+      - name: Check if there is an existing open PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pr_count=$(gh pr list --state open --search "Update to ${{ env.LATEST_VERSION }}")
+          if [ -n "$pr_count" ]; then
+            echo "EXISTING_PR=true" >> $GITHUB_ENV
+          else
+            echo "EXISTING_PR=false" >> $GITHUB_ENV
+          fi
+      
+      - name: Setup Go
+        if: env.NEW_RELEASE == 'true' && env.EXISTING_PR == 'false'      
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Create a Pull Request
+        if: env.NEW_RELEASE == 'true' && env.EXISTING_PR == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "--- Setup Git ---"
+          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git config --global user.email "${{ env.CI_COMMIT_EMAIL }}"
+          git checkout -b update-to-${{ env.LATEST_VERSION }}
+
+          echo "--- Update version in files ---"
+          sed -i "s/${{ env.CURRENT_VERSION }}/${{ env.LATEST_VERSION }}/g" Taskfile.yml
+          sed -i "s/${{ env.CURRENT_VERSION }}/${{ env.LATEST_VERSION }}/g" README.md
+
+          echo "--- Update submodule ---"
+          git submodule update --init --remote
+          git -C karakeep checkout ${{ env.LATEST_VERSION }}
+
+          echo "--- Generate API client ---"
+          go get .
+          go mod tidy
+          go generate
+
+          echo "--- Commit changes ---"
+          git add .
+          git commit -m "feat: bump version to ${{ env.LATEST_VERSION }}"
+          git push origin update-to-${{ env.LATEST_VERSION }}
+
+          echo "--- Create Pull Request ---"
+          gh pr create --title "Update to ${{ env.LATEST_VERSION }}" --body "[Karakeep ${{ env.LATEST_VERSION }}](https://github.com/karakeep-app/karakeep/releases/tag/${{ env.LATEST_VERSION }}) has been released. Please review and merge this PR 🙏" --assignee "Madh93"
+          
+          echo "Pull Request created successfully!"
