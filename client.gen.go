@@ -104,7 +104,7 @@ type ClientInterface interface {
 	DeleteBookmarksBookmarkId(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetBookmarksBookmarkId request
-	GetBookmarksBookmarkId(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetBookmarksBookmarkId(ctx context.Context, bookmarkId BookmarkId, params *GetBookmarksBookmarkIdParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PatchBookmarksBookmarkIdWithBody request with any body
 	PatchBookmarksBookmarkIdWithBody(ctx context.Context, bookmarkId BookmarkId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -271,8 +271,8 @@ func (c *Client) DeleteBookmarksBookmarkId(ctx context.Context, bookmarkId Bookm
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetBookmarksBookmarkId(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetBookmarksBookmarkIdRequest(c.Server, bookmarkId)
+func (c *Client) GetBookmarksBookmarkId(ctx context.Context, bookmarkId BookmarkId, params *GetBookmarksBookmarkIdParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetBookmarksBookmarkIdRequest(c.Server, bookmarkId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -825,6 +825,22 @@ func NewGetBookmarksRequest(server string, params *GetBookmarksParams) (*http.Re
 
 		}
 
+		if params.IncludeContent != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "includeContent", runtime.ParamLocationQuery, *params.IncludeContent); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
@@ -942,6 +958,22 @@ func NewGetBookmarksSearchRequest(server string, params *GetBookmarksSearchParam
 
 		}
 
+		if params.IncludeContent != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "includeContent", runtime.ParamLocationQuery, *params.IncludeContent); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
@@ -988,7 +1020,7 @@ func NewDeleteBookmarksBookmarkIdRequest(server string, bookmarkId BookmarkId) (
 }
 
 // NewGetBookmarksBookmarkIdRequest generates requests for GetBookmarksBookmarkId
-func NewGetBookmarksBookmarkIdRequest(server string, bookmarkId BookmarkId) (*http.Request, error) {
+func NewGetBookmarksBookmarkIdRequest(server string, bookmarkId BookmarkId, params *GetBookmarksBookmarkIdParams) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1011,6 +1043,28 @@ func NewGetBookmarksBookmarkIdRequest(server string, bookmarkId BookmarkId) (*ht
 	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.IncludeContent != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "includeContent", runtime.ParamLocationQuery, *params.IncludeContent); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
@@ -1835,6 +1889,22 @@ func NewGetListsListIdBookmarksRequest(server string, listId ListId, params *Get
 
 		}
 
+		if params.IncludeContent != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "includeContent", runtime.ParamLocationQuery, *params.IncludeContent); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
@@ -2131,6 +2201,22 @@ func NewGetTagsTagIdBookmarksRequest(server string, tagId TagId, params *GetTags
 
 		}
 
+		if params.IncludeContent != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "includeContent", runtime.ParamLocationQuery, *params.IncludeContent); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
@@ -2254,7 +2340,7 @@ type ClientWithResponsesInterface interface {
 	DeleteBookmarksBookmarkIdWithResponse(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*DeleteBookmarksBookmarkIdResponse, error)
 
 	// GetBookmarksBookmarkIdWithResponse request
-	GetBookmarksBookmarkIdWithResponse(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*GetBookmarksBookmarkIdResponse, error)
+	GetBookmarksBookmarkIdWithResponse(ctx context.Context, bookmarkId BookmarkId, params *GetBookmarksBookmarkIdParams, reqEditors ...RequestEditorFn) (*GetBookmarksBookmarkIdResponse, error)
 
 	// PatchBookmarksBookmarkIdWithBodyWithResponse request with any body
 	PatchBookmarksBookmarkIdWithBodyWithResponse(ctx context.Context, bookmarkId BookmarkId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchBookmarksBookmarkIdResponse, error)
@@ -2387,6 +2473,10 @@ type PostBookmarksResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *Bookmark
+	JSON400      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2430,6 +2520,10 @@ func (r GetBookmarksSearchResponse) StatusCode() int {
 type DeleteBookmarksBookmarkIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2452,6 +2546,10 @@ type GetBookmarksBookmarkIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Bookmark
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2484,6 +2582,10 @@ type PatchBookmarksBookmarkIdResponse struct {
 		TaggingStatus *PatchBookmarksBookmarkId200TaggingStatus `json:"taggingStatus"`
 		Title         *string                                   `json:"title"`
 	}
+	JSON404 *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 type PatchBookmarksBookmarkId200TaggingStatus string
 
@@ -2510,6 +2612,10 @@ type PostBookmarksBookmarkIdAssetsResponse struct {
 		AssetType PostBookmarksBookmarkIdAssets201AssetType `json:"assetType"`
 		Id        string                                    `json:"id"`
 	}
+	JSON404 *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 type PostBookmarksBookmarkIdAssets201AssetType string
 
@@ -2532,6 +2638,10 @@ func (r PostBookmarksBookmarkIdAssetsResponse) StatusCode() int {
 type DeleteBookmarksBookmarkIdAssetsAssetIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2553,6 +2663,10 @@ func (r DeleteBookmarksBookmarkIdAssetsAssetIdResponse) StatusCode() int {
 type PutBookmarksBookmarkIdAssetsAssetIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2576,6 +2690,10 @@ type GetBookmarksBookmarkIdHighlightsResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *struct {
 		Highlights []Highlight `json:"highlights"`
+	}
+	JSON404 *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
 	}
 }
 
@@ -2609,6 +2727,10 @@ type PostBookmarksBookmarkIdSummarizeResponse struct {
 		TaggingStatus *PostBookmarksBookmarkIdSummarize200TaggingStatus `json:"taggingStatus"`
 		Title         *string                                           `json:"title"`
 	}
+	JSON404 *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 type PostBookmarksBookmarkIdSummarize200TaggingStatus string
 
@@ -2634,6 +2756,10 @@ type DeleteBookmarksBookmarkIdTagsResponse struct {
 	JSON200      *struct {
 		Detached []TagId `json:"detached"`
 	}
+	JSON404 *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2657,6 +2783,10 @@ type PostBookmarksBookmarkIdTagsResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *struct {
 		Attached []TagId `json:"attached"`
+	}
+	JSON404 *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
 	}
 }
 
@@ -2702,6 +2832,14 @@ type PostHighlightsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *Highlight
+	JSON400      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	JSON404 *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2724,6 +2862,10 @@ type DeleteHighlightsHighlightIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Highlight
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2746,6 +2888,10 @@ type GetHighlightsHighlightIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Highlight
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2768,6 +2914,10 @@ type PatchHighlightsHighlightIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Highlight
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2814,6 +2964,10 @@ type PostListsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *List
+	JSON400      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2835,6 +2989,10 @@ func (r PostListsResponse) StatusCode() int {
 type DeleteListsListIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2857,6 +3015,10 @@ type GetListsListIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *List
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2879,6 +3041,10 @@ type PatchListsListIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *List
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2901,6 +3067,10 @@ type GetListsListIdBookmarksResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *PaginatedBookmarks
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2922,6 +3092,14 @@ func (r GetListsListIdBookmarksResponse) StatusCode() int {
 type DeleteListsListIdBookmarksBookmarkIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON400      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	JSON404 *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2943,6 +3121,14 @@ func (r DeleteListsListIdBookmarksBookmarkIdResponse) StatusCode() int {
 type PutListsListIdBookmarksBookmarkIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON400      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	JSON404 *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -2988,6 +3174,10 @@ func (r GetTagsResponse) StatusCode() int {
 type DeleteTagsTagIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -3010,6 +3200,10 @@ type GetTagsTagIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Tag
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -3032,6 +3226,10 @@ type PatchTagsTagIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Tag
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -3054,6 +3252,10 @@ type GetTagsTagIdBookmarksResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *PaginatedBookmarks
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
 }
 
 // Status returns HTTPResponse.Status
@@ -3172,8 +3374,8 @@ func (c *ClientWithResponses) DeleteBookmarksBookmarkIdWithResponse(ctx context.
 }
 
 // GetBookmarksBookmarkIdWithResponse request returning *GetBookmarksBookmarkIdResponse
-func (c *ClientWithResponses) GetBookmarksBookmarkIdWithResponse(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*GetBookmarksBookmarkIdResponse, error) {
-	rsp, err := c.GetBookmarksBookmarkId(ctx, bookmarkId, reqEditors...)
+func (c *ClientWithResponses) GetBookmarksBookmarkIdWithResponse(ctx context.Context, bookmarkId BookmarkId, params *GetBookmarksBookmarkIdParams, reqEditors ...RequestEditorFn) (*GetBookmarksBookmarkIdResponse, error) {
+	rsp, err := c.GetBookmarksBookmarkId(ctx, bookmarkId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -3559,6 +3761,16 @@ func ParsePostBookmarksResponse(rsp *http.Response) (*PostBookmarksResponse, err
 		}
 		response.JSON201 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
 	}
 
 	return response, nil
@@ -3603,6 +3815,19 @@ func ParseDeleteBookmarksBookmarkIdResponse(rsp *http.Response) (*DeleteBookmark
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -3626,6 +3851,16 @@ func ParseGetBookmarksBookmarkIdResponse(rsp *http.Response) (*GetBookmarksBookm
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
 
 	}
 
@@ -3663,6 +3898,16 @@ func ParsePatchBookmarksBookmarkIdResponse(rsp *http.Response) (*PatchBookmarksB
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
 	}
 
 	return response, nil
@@ -3692,6 +3937,16 @@ func ParsePostBookmarksBookmarkIdAssetsResponse(rsp *http.Response) (*PostBookma
 		}
 		response.JSON201 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
 	}
 
 	return response, nil
@@ -3710,6 +3965,19 @@ func ParseDeleteBookmarksBookmarkIdAssetsAssetIdResponse(rsp *http.Response) (*D
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -3724,6 +3992,19 @@ func ParsePutBookmarksBookmarkIdAssetsAssetIdResponse(rsp *http.Response) (*PutB
 	response := &PutBookmarksBookmarkIdAssetsAssetIdResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
 	}
 
 	return response, nil
@@ -3751,6 +4032,16 @@ func ParseGetBookmarksBookmarkIdHighlightsResponse(rsp *http.Response) (*GetBook
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
 
 	}
 
@@ -3788,6 +4079,16 @@ func ParsePostBookmarksBookmarkIdSummarizeResponse(rsp *http.Response) (*PostBoo
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
 	}
 
 	return response, nil
@@ -3816,6 +4117,16 @@ func ParseDeleteBookmarksBookmarkIdTagsResponse(rsp *http.Response) (*DeleteBook
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
 	}
 
 	return response, nil
@@ -3843,6 +4154,16 @@ func ParsePostBookmarksBookmarkIdTagsResponse(rsp *http.Response) (*PostBookmark
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
 
 	}
 
@@ -3896,6 +4217,26 @@ func ParsePostHighlightsResponse(rsp *http.Response) (*PostHighlightsResponse, e
 		}
 		response.JSON201 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
 	}
 
 	return response, nil
@@ -3921,6 +4262,16 @@ func ParseDeleteHighlightsHighlightIdResponse(rsp *http.Response) (*DeleteHighli
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
 
 	}
 
@@ -3948,6 +4299,16 @@ func ParseGetHighlightsHighlightIdResponse(rsp *http.Response) (*GetHighlightsHi
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
 	}
 
 	return response, nil
@@ -3973,6 +4334,16 @@ func ParsePatchHighlightsHighlightIdResponse(rsp *http.Response) (*PatchHighligh
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
 
 	}
 
@@ -4028,6 +4399,16 @@ func ParsePostListsResponse(rsp *http.Response) (*PostListsResponse, error) {
 		}
 		response.JSON201 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
 	}
 
 	return response, nil
@@ -4044,6 +4425,19 @@ func ParseDeleteListsListIdResponse(rsp *http.Response) (*DeleteListsListIdRespo
 	response := &DeleteListsListIdResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
 	}
 
 	return response, nil
@@ -4069,6 +4463,16 @@ func ParseGetListsListIdResponse(rsp *http.Response) (*GetListsListIdResponse, e
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
 
 	}
 
@@ -4096,6 +4500,16 @@ func ParsePatchListsListIdResponse(rsp *http.Response) (*PatchListsListIdRespons
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
 	}
 
 	return response, nil
@@ -4122,6 +4536,16 @@ func ParseGetListsListIdBookmarksResponse(rsp *http.Response) (*GetListsListIdBo
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
 	}
 
 	return response, nil
@@ -4140,6 +4564,29 @@ func ParseDeleteListsListIdBookmarksBookmarkIdResponse(rsp *http.Response) (*Del
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -4154,6 +4601,29 @@ func ParsePutListsListIdBookmarksBookmarkIdResponse(rsp *http.Response) (*PutLis
 	response := &PutListsListIdBookmarksBookmarkIdResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
 	}
 
 	return response, nil
@@ -4200,6 +4670,19 @@ func ParseDeleteTagsTagIdResponse(rsp *http.Response) (*DeleteTagsTagIdResponse,
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -4223,6 +4706,16 @@ func ParseGetTagsTagIdResponse(rsp *http.Response) (*GetTagsTagIdResponse, error
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
 
 	}
 
@@ -4250,6 +4743,16 @@ func ParsePatchTagsTagIdResponse(rsp *http.Response) (*PatchTagsTagIdResponse, e
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
 	}
 
 	return response, nil
@@ -4275,6 +4778,16 @@ func ParseGetTagsTagIdBookmarksResponse(rsp *http.Response) (*GetTagsTagIdBookma
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
 
 	}
 

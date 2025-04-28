@@ -200,6 +200,7 @@ type BookmarkContent1Type string
 type BookmarkContent2 struct {
 	AssetId   string                    `json:"assetId"`
 	AssetType BookmarkContent2AssetType `json:"assetType"`
+	Content   *string                   `json:"content"`
 	FileName  *string                   `json:"fileName"`
 	Size      *float32                  `json:"size"`
 	SourceUrl *string                   `json:"sourceUrl"`
@@ -258,12 +259,13 @@ type HighlightId = string
 
 // List defines model for List.
 type List struct {
-	Icon     string    `json:"icon"`
-	Id       string    `json:"id"`
-	Name     string    `json:"name"`
-	ParentId *string   `json:"parentId"`
-	Query    *string   `json:"query"`
-	Type     *ListType `json:"type,omitempty"`
+	Description *string   `json:"description"`
+	Icon        string    `json:"icon"`
+	Id          string    `json:"id"`
+	Name        string    `json:"name"`
+	ParentId    *string   `json:"parentId"`
+	Query       *string   `json:"query"`
+	Type        *ListType `json:"type,omitempty"`
 }
 
 // ListType defines model for List.Type.
@@ -304,6 +306,9 @@ type GetBookmarksParams struct {
 	Favourited *bool    `form:"favourited,omitempty" json:"favourited,omitempty"`
 	Limit      *float32 `form:"limit,omitempty" json:"limit,omitempty"`
 	Cursor     *Cursor  `form:"cursor,omitempty" json:"cursor,omitempty"`
+
+	// IncludeContent If set to true, bookmark's content will be included in the response. Note, this content can be large for some bookmarks.
+	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
 }
 
 // PostBookmarksJSONBody defines parameters for PostBookmarks.
@@ -357,16 +362,33 @@ type GetBookmarksSearchParams struct {
 	Q      string   `form:"q" json:"q"`
 	Limit  *float32 `form:"limit,omitempty" json:"limit,omitempty"`
 	Cursor *Cursor  `form:"cursor,omitempty" json:"cursor,omitempty"`
+
+	// IncludeContent If set to true, bookmark's content will be included in the response. Note, this content can be large for some bookmarks.
+	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
+}
+
+// GetBookmarksBookmarkIdParams defines parameters for GetBookmarksBookmarkId.
+type GetBookmarksBookmarkIdParams struct {
+	// IncludeContent If set to true, bookmark's content will be included in the response. Note, this content can be large for some bookmarks.
+	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
 }
 
 // PatchBookmarksBookmarkIdJSONBody defines parameters for PatchBookmarksBookmarkId.
 type PatchBookmarksBookmarkIdJSONBody struct {
-	Archived   *bool   `json:"archived,omitempty"`
-	CreatedAt  *string `json:"createdAt"`
-	Favourited *bool   `json:"favourited,omitempty"`
-	Note       *string `json:"note,omitempty"`
-	Summary    *string `json:"summary"`
-	Title      *string `json:"title"`
+	Archived      *bool   `json:"archived,omitempty"`
+	AssetContent  *string `json:"assetContent"`
+	Author        *string `json:"author"`
+	CreatedAt     *string `json:"createdAt"`
+	DateModified  *string `json:"dateModified"`
+	DatePublished *string `json:"datePublished"`
+	Description   *string `json:"description"`
+	Favourited    *bool   `json:"favourited,omitempty"`
+	Note          *string `json:"note,omitempty"`
+	Publisher     *string `json:"publisher"`
+	Summary       *string `json:"summary"`
+	Text          *string `json:"text"`
+	Title         *string `json:"title"`
+	Url           *string `json:"url,omitempty"`
 }
 
 // PostBookmarksBookmarkIdAssetsJSONBody defines parameters for PostBookmarksBookmarkIdAssets.
@@ -428,11 +450,12 @@ type PatchHighlightsHighlightIdJSONBodyColor string
 
 // PostListsJSONBody defines parameters for PostLists.
 type PostListsJSONBody struct {
-	Icon     string                 `json:"icon"`
-	Name     string                 `json:"name"`
-	ParentId *string                `json:"parentId"`
-	Query    *string                `json:"query,omitempty"`
-	Type     *PostListsJSONBodyType `json:"type,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Icon        string                 `json:"icon"`
+	Name        string                 `json:"name"`
+	ParentId    *string                `json:"parentId"`
+	Query       *string                `json:"query,omitempty"`
+	Type        *PostListsJSONBodyType `json:"type,omitempty"`
 }
 
 // PostListsJSONBodyType defines parameters for PostLists.
@@ -440,16 +463,20 @@ type PostListsJSONBodyType string
 
 // PatchListsListIdJSONBody defines parameters for PatchListsListId.
 type PatchListsListIdJSONBody struct {
-	Icon     *string `json:"icon,omitempty"`
-	Name     *string `json:"name,omitempty"`
-	ParentId *string `json:"parentId"`
-	Query    *string `json:"query,omitempty"`
+	Description *string `json:"description"`
+	Icon        *string `json:"icon,omitempty"`
+	Name        *string `json:"name,omitempty"`
+	ParentId    *string `json:"parentId"`
+	Query       *string `json:"query,omitempty"`
 }
 
 // GetListsListIdBookmarksParams defines parameters for GetListsListIdBookmarks.
 type GetListsListIdBookmarksParams struct {
 	Limit  *float32 `form:"limit,omitempty" json:"limit,omitempty"`
 	Cursor *Cursor  `form:"cursor,omitempty" json:"cursor,omitempty"`
+
+	// IncludeContent If set to true, bookmark's content will be included in the response. Note, this content can be large for some bookmarks.
+	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
 }
 
 // PatchTagsTagIdJSONBody defines parameters for PatchTagsTagId.
@@ -461,6 +488,9 @@ type PatchTagsTagIdJSONBody struct {
 type GetTagsTagIdBookmarksParams struct {
 	Limit  *float32 `form:"limit,omitempty" json:"limit,omitempty"`
 	Cursor *Cursor  `form:"cursor,omitempty" json:"cursor,omitempty"`
+
+	// IncludeContent If set to true, bookmark's content will be included in the response. Note, this content can be large for some bookmarks.
+	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
 }
 
 // PostBookmarksJSONRequestBody defines body for PostBookmarks for application/json ContentType.
