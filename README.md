@@ -8,7 +8,7 @@
 [Go](https://go.dev/) client library for [Karakeep](https://karakeep.app).
 
 The `go-karakeep` client is auto-generated using the
-[`oapi-codegen`](https://github.com/oapi-codegen/oapi-codegen) tool, which allows convert [Karakeep OpenAPI](https://github.com/karakeep-app/karakeep/blob/v0.23.1/packages/open-api/karakeep-openapi-spec.json) specification to Go code.
+[`oapi-codegen`](https://github.com/oapi-codegen/oapi-codegen) tool, which allows convert [Karakeep OpenAPI](https://github.com/karakeep-app/karakeep/blob/v0.24.1/packages/open-api/karakeep-openapi-spec.json) specification to Go code.
 
 ## Requirements
 
