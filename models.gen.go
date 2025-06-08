@@ -51,11 +51,18 @@ const (
 	BookmarkContent3TypeUnknown BookmarkContent3Type = "unknown"
 )
 
+// Defines values for BookmarkSummarizationStatus.
+const (
+	BookmarkSummarizationStatusFailure BookmarkSummarizationStatus = "failure"
+	BookmarkSummarizationStatusPending BookmarkSummarizationStatus = "pending"
+	BookmarkSummarizationStatusSuccess BookmarkSummarizationStatus = "success"
+)
+
 // Defines values for BookmarkTaggingStatus.
 const (
-	Failure BookmarkTaggingStatus = "failure"
-	Pending BookmarkTaggingStatus = "pending"
-	Success BookmarkTaggingStatus = "success"
+	BookmarkTaggingStatusFailure BookmarkTaggingStatus = "failure"
+	BookmarkTaggingStatusPending BookmarkTaggingStatus = "pending"
+	BookmarkTaggingStatusSuccess BookmarkTaggingStatus = "success"
 )
 
 // Defines values for BookmarkTagsAttachedBy.
@@ -78,6 +85,12 @@ const (
 	ListTypeSmart  ListType = "smart"
 )
 
+// Defines values for GetBookmarksParamsSortOrder.
+const (
+	GetBookmarksParamsSortOrderAsc  GetBookmarksParamsSortOrder = "asc"
+	GetBookmarksParamsSortOrderDesc GetBookmarksParamsSortOrder = "desc"
+)
+
 // Defines values for PostBookmarksJSONBody0Type.
 const (
 	PostBookmarksJSONBody0TypeLink PostBookmarksJSONBody0Type = "link"
@@ -97,6 +110,13 @@ const (
 // Defines values for PostBookmarksJSONBody2Type.
 const (
 	PostBookmarksJSONBody2TypeAsset PostBookmarksJSONBody2Type = "asset"
+)
+
+// Defines values for GetBookmarksSearchParamsSortOrder.
+const (
+	GetBookmarksSearchParamsSortOrderAsc       GetBookmarksSearchParamsSortOrder = "asc"
+	GetBookmarksSearchParamsSortOrderDesc      GetBookmarksSearchParamsSortOrder = "desc"
+	GetBookmarksSearchParamsSortOrderRelevance GetBookmarksSearchParamsSortOrder = "relevance"
 )
 
 // Defines values for PostBookmarksBookmarkIdAssetsJSONBodyAssetType.
@@ -133,6 +153,26 @@ const (
 	PostListsJSONBodyTypeSmart  PostListsJSONBodyType = "smart"
 )
 
+// Defines values for GetListsListIdBookmarksParamsSortOrder.
+const (
+	GetListsListIdBookmarksParamsSortOrderAsc  GetListsListIdBookmarksParamsSortOrder = "asc"
+	GetListsListIdBookmarksParamsSortOrderDesc GetListsListIdBookmarksParamsSortOrder = "desc"
+)
+
+// Defines values for GetTagsTagIdBookmarksParamsSortOrder.
+const (
+	GetTagsTagIdBookmarksParamsSortOrderAsc  GetTagsTagIdBookmarksParamsSortOrder = "asc"
+	GetTagsTagIdBookmarksParamsSortOrderDesc GetTagsTagIdBookmarksParamsSortOrder = "desc"
+)
+
+// Asset defines model for Asset.
+type Asset struct {
+	AssetId     string  `json:"assetId"`
+	ContentType string  `json:"contentType"`
+	FileName    string  `json:"fileName"`
+	Size        float32 `json:"size"`
+}
+
 // AssetId defines model for AssetId.
 type AssetId = string
 
@@ -143,15 +183,16 @@ type Bookmark struct {
 		AssetType BookmarkAssetsAssetType `json:"assetType"`
 		Id        string                  `json:"id"`
 	} `json:"assets"`
-	Content       Bookmark_Content       `json:"content"`
-	CreatedAt     string                 `json:"createdAt"`
-	Favourited    bool                   `json:"favourited"`
-	Id            string                 `json:"id"`
-	ModifiedAt    *string                `json:"modifiedAt"`
-	Note          *string                `json:"note"`
-	Summary       *string                `json:"summary"`
-	TaggingStatus *BookmarkTaggingStatus `json:"taggingStatus"`
-	Tags          []struct {
+	Content             Bookmark_Content             `json:"content"`
+	CreatedAt           string                       `json:"createdAt"`
+	Favourited          bool                         `json:"favourited"`
+	Id                  string                       `json:"id"`
+	ModifiedAt          *string                      `json:"modifiedAt"`
+	Note                *string                      `json:"note"`
+	SummarizationStatus *BookmarkSummarizationStatus `json:"summarizationStatus"`
+	Summary             *string                      `json:"summary"`
+	TaggingStatus       *BookmarkTaggingStatus       `json:"taggingStatus"`
+	Tags                []struct {
 		AttachedBy BookmarkTagsAttachedBy `json:"attachedBy"`
 		Id         string                 `json:"id"`
 		Name       string                 `json:"name"`
@@ -226,6 +267,9 @@ type Bookmark_Content struct {
 	union json.RawMessage
 }
 
+// BookmarkSummarizationStatus defines model for Bookmark.SummarizationStatus.
+type BookmarkSummarizationStatus string
+
 // BookmarkTaggingStatus defines model for Bookmark.TaggingStatus.
 type BookmarkTaggingStatus string
 
@@ -237,6 +281,9 @@ type BookmarkId = string
 
 // Cursor defines model for Cursor.
 type Cursor = string
+
+// FileToBeUploaded defines model for File to be uploaded.
+type FileToBeUploaded = interface{}
 
 // Highlight defines model for Highlight.
 type Highlight struct {
@@ -264,6 +311,7 @@ type List struct {
 	Id          string    `json:"id"`
 	Name        string    `json:"name"`
 	ParentId    *string   `json:"parentId"`
+	Public      bool      `json:"public"`
 	Query       *string   `json:"query"`
 	Type        *ListType `json:"type,omitempty"`
 }
@@ -300,16 +348,25 @@ type Tag struct {
 // TagId defines model for TagId.
 type TagId = string
 
+// PostAssetsMultipartBody defines parameters for PostAssets.
+type PostAssetsMultipartBody struct {
+	File *FileToBeUploaded `json:"file,omitempty"`
+}
+
 // GetBookmarksParams defines parameters for GetBookmarks.
 type GetBookmarksParams struct {
-	Archived   *bool    `form:"archived,omitempty" json:"archived,omitempty"`
-	Favourited *bool    `form:"favourited,omitempty" json:"favourited,omitempty"`
-	Limit      *float32 `form:"limit,omitempty" json:"limit,omitempty"`
-	Cursor     *Cursor  `form:"cursor,omitempty" json:"cursor,omitempty"`
+	Archived   *bool                        `form:"archived,omitempty" json:"archived,omitempty"`
+	Favourited *bool                        `form:"favourited,omitempty" json:"favourited,omitempty"`
+	SortOrder  *GetBookmarksParamsSortOrder `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
+	Limit      *float32                     `form:"limit,omitempty" json:"limit,omitempty"`
+	Cursor     *Cursor                      `form:"cursor,omitempty" json:"cursor,omitempty"`
 
 	// IncludeContent If set to true, bookmark's content will be included in the response. Note, this content can be large for some bookmarks.
 	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
 }
+
+// GetBookmarksParamsSortOrder defines parameters for GetBookmarks.
+type GetBookmarksParamsSortOrder string
 
 // PostBookmarksJSONBody defines parameters for PostBookmarks.
 type PostBookmarksJSONBody struct {
@@ -359,13 +416,17 @@ type PostBookmarksJSONBody2Type string
 
 // GetBookmarksSearchParams defines parameters for GetBookmarksSearch.
 type GetBookmarksSearchParams struct {
-	Q      string   `form:"q" json:"q"`
-	Limit  *float32 `form:"limit,omitempty" json:"limit,omitempty"`
-	Cursor *Cursor  `form:"cursor,omitempty" json:"cursor,omitempty"`
+	Q         string                             `form:"q" json:"q"`
+	SortOrder *GetBookmarksSearchParamsSortOrder `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
+	Limit     *float32                           `form:"limit,omitempty" json:"limit,omitempty"`
+	Cursor    *Cursor                            `form:"cursor,omitempty" json:"cursor,omitempty"`
 
 	// IncludeContent If set to true, bookmark's content will be included in the response. Note, this content can be large for some bookmarks.
 	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
 }
+
+// GetBookmarksSearchParamsSortOrder defines parameters for GetBookmarksSearch.
+type GetBookmarksSearchParamsSortOrder string
 
 // GetBookmarksBookmarkIdParams defines parameters for GetBookmarksBookmarkId.
 type GetBookmarksBookmarkIdParams struct {
@@ -467,16 +528,26 @@ type PatchListsListIdJSONBody struct {
 	Icon        *string `json:"icon,omitempty"`
 	Name        *string `json:"name,omitempty"`
 	ParentId    *string `json:"parentId"`
+	Public      *bool   `json:"public,omitempty"`
 	Query       *string `json:"query,omitempty"`
 }
 
 // GetListsListIdBookmarksParams defines parameters for GetListsListIdBookmarks.
 type GetListsListIdBookmarksParams struct {
-	Limit  *float32 `form:"limit,omitempty" json:"limit,omitempty"`
-	Cursor *Cursor  `form:"cursor,omitempty" json:"cursor,omitempty"`
+	SortOrder *GetListsListIdBookmarksParamsSortOrder `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
+	Limit     *float32                                `form:"limit,omitempty" json:"limit,omitempty"`
+	Cursor    *Cursor                                 `form:"cursor,omitempty" json:"cursor,omitempty"`
 
 	// IncludeContent If set to true, bookmark's content will be included in the response. Note, this content can be large for some bookmarks.
 	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
+}
+
+// GetListsListIdBookmarksParamsSortOrder defines parameters for GetListsListIdBookmarks.
+type GetListsListIdBookmarksParamsSortOrder string
+
+// PostTagsJSONBody defines parameters for PostTags.
+type PostTagsJSONBody struct {
+	Name string `json:"name"`
 }
 
 // PatchTagsTagIdJSONBody defines parameters for PatchTagsTagId.
@@ -486,12 +557,19 @@ type PatchTagsTagIdJSONBody struct {
 
 // GetTagsTagIdBookmarksParams defines parameters for GetTagsTagIdBookmarks.
 type GetTagsTagIdBookmarksParams struct {
-	Limit  *float32 `form:"limit,omitempty" json:"limit,omitempty"`
-	Cursor *Cursor  `form:"cursor,omitempty" json:"cursor,omitempty"`
+	SortOrder *GetTagsTagIdBookmarksParamsSortOrder `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
+	Limit     *float32                              `form:"limit,omitempty" json:"limit,omitempty"`
+	Cursor    *Cursor                               `form:"cursor,omitempty" json:"cursor,omitempty"`
 
 	// IncludeContent If set to true, bookmark's content will be included in the response. Note, this content can be large for some bookmarks.
 	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
 }
+
+// GetTagsTagIdBookmarksParamsSortOrder defines parameters for GetTagsTagIdBookmarks.
+type GetTagsTagIdBookmarksParamsSortOrder string
+
+// PostAssetsMultipartRequestBody defines body for PostAssets for multipart/form-data ContentType.
+type PostAssetsMultipartRequestBody PostAssetsMultipartBody
 
 // PostBookmarksJSONRequestBody defines body for PostBookmarks for application/json ContentType.
 type PostBookmarksJSONRequestBody PostBookmarksJSONBody
@@ -522,6 +600,9 @@ type PostListsJSONRequestBody PostListsJSONBody
 
 // PatchListsListIdJSONRequestBody defines body for PatchListsListId for application/json ContentType.
 type PatchListsListIdJSONRequestBody PatchListsListIdJSONBody
+
+// PostTagsJSONRequestBody defines body for PostTags for application/json ContentType.
+type PostTagsJSONRequestBody PostTagsJSONBody
 
 // PatchTagsTagIdJSONRequestBody defines body for PatchTagsTagId for application/json ContentType.
 type PatchTagsTagIdJSONRequestBody PatchTagsTagIdJSONBody

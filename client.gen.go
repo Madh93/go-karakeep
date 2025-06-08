@@ -89,6 +89,12 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// PostAssetsWithBody request with any body
+	PostAssetsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetAssetsAssetId request
+	GetAssetsAssetId(ctx context.Context, assetId AssetId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetBookmarks request
 	GetBookmarks(ctx context.Context, params *GetBookmarksParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -190,6 +196,11 @@ type ClientInterface interface {
 	// GetTags request
 	GetTags(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// PostTagsWithBody request with any body
+	PostTagsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostTags(ctx context.Context, body PostTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// DeleteTagsTagId request
 	DeleteTagsTagId(ctx context.Context, tagId TagId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -209,6 +220,30 @@ type ClientInterface interface {
 
 	// GetUsersMeStats request
 	GetUsersMeStats(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
+
+func (c *Client) PostAssetsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostAssetsRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetAssetsAssetId(ctx context.Context, assetId AssetId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetAssetsAssetIdRequest(c.Server, assetId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) GetBookmarks(ctx context.Context, params *GetBookmarksParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -655,6 +690,30 @@ func (c *Client) GetTags(ctx context.Context, reqEditors ...RequestEditorFn) (*h
 	return c.Client.Do(req)
 }
 
+func (c *Client) PostTagsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostTagsRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostTags(ctx context.Context, body PostTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostTagsRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) DeleteTagsTagId(ctx context.Context, tagId TagId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteTagsTagIdRequest(c.Server, tagId)
 	if err != nil {
@@ -739,6 +798,69 @@ func (c *Client) GetUsersMeStats(ctx context.Context, reqEditors ...RequestEdito
 	return c.Client.Do(req)
 }
 
+// NewPostAssetsRequestWithBody generates requests for PostAssets with any type of body
+func NewPostAssetsRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/assets")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetAssetsAssetIdRequest generates requests for GetAssetsAssetId
+func NewGetAssetsAssetIdRequest(server string, assetId AssetId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "assetId", runtime.ParamLocationPath, assetId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/assets/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewGetBookmarksRequest generates requests for GetBookmarks
 func NewGetBookmarksRequest(server string, params *GetBookmarksParams) (*http.Request, error) {
 	var err error
@@ -780,6 +902,22 @@ func NewGetBookmarksRequest(server string, params *GetBookmarksParams) (*http.Re
 		if params.Favourited != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "favourited", runtime.ParamLocationQuery, *params.Favourited); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortOrder != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortOrder", runtime.ParamLocationQuery, *params.SortOrder); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err
@@ -924,6 +1062,22 @@ func NewGetBookmarksSearchRequest(server string, params *GetBookmarksSearchParam
 					queryValues.Add(k, v2)
 				}
 			}
+		}
+
+		if params.SortOrder != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortOrder", runtime.ParamLocationQuery, *params.SortOrder); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
 		}
 
 		if params.Limit != nil {
@@ -1857,6 +2011,22 @@ func NewGetListsListIdBookmarksRequest(server string, listId ListId, params *Get
 	if params != nil {
 		queryValues := queryURL.Query()
 
+		if params.SortOrder != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortOrder", runtime.ParamLocationQuery, *params.SortOrder); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.Limit != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
@@ -2025,6 +2195,46 @@ func NewGetTagsRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
+// NewPostTagsRequest calls the generic PostTags builder with application/json body
+func NewPostTagsRequest(server string, body PostTagsJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostTagsRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostTagsRequestWithBody generates requests for PostTags with any type of body
+func NewPostTagsRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/tags")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewDeleteTagsTagIdRequest generates requests for DeleteTagsTagId
 func NewDeleteTagsTagIdRequest(server string, tagId TagId) (*http.Request, error) {
 	var err error
@@ -2168,6 +2378,22 @@ func NewGetTagsTagIdBookmarksRequest(server string, tagId TagId, params *GetTags
 
 	if params != nil {
 		queryValues := queryURL.Query()
+
+		if params.SortOrder != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortOrder", runtime.ParamLocationQuery, *params.SortOrder); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
 
 		if params.Limit != nil {
 
@@ -2325,6 +2551,12 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// PostAssetsWithBodyWithResponse request with any body
+	PostAssetsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostAssetsResponse, error)
+
+	// GetAssetsAssetIdWithResponse request
+	GetAssetsAssetIdWithResponse(ctx context.Context, assetId AssetId, reqEditors ...RequestEditorFn) (*GetAssetsAssetIdResponse, error)
+
 	// GetBookmarksWithResponse request
 	GetBookmarksWithResponse(ctx context.Context, params *GetBookmarksParams, reqEditors ...RequestEditorFn) (*GetBookmarksResponse, error)
 
@@ -2426,6 +2658,11 @@ type ClientWithResponsesInterface interface {
 	// GetTagsWithResponse request
 	GetTagsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetTagsResponse, error)
 
+	// PostTagsWithBodyWithResponse request with any body
+	PostTagsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostTagsResponse, error)
+
+	PostTagsWithResponse(ctx context.Context, body PostTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*PostTagsResponse, error)
+
 	// DeleteTagsTagIdWithResponse request
 	DeleteTagsTagIdWithResponse(ctx context.Context, tagId TagId, reqEditors ...RequestEditorFn) (*DeleteTagsTagIdResponse, error)
 
@@ -2445,6 +2682,49 @@ type ClientWithResponsesInterface interface {
 
 	// GetUsersMeStatsWithResponse request
 	GetUsersMeStatsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetUsersMeStatsResponse, error)
+}
+
+type PostAssetsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Asset
+}
+
+// Status returns HTTPResponse.Status
+func (r PostAssetsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostAssetsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetAssetsAssetIdResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+}
+
+// Status returns HTTPResponse.Status
+func (r GetAssetsAssetIdResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetAssetsAssetIdResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
 }
 
 type GetBookmarksResponse struct {
@@ -2572,21 +2852,23 @@ type PatchBookmarksBookmarkIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
-		Archived      bool                                      `json:"archived"`
-		CreatedAt     string                                    `json:"createdAt"`
-		Favourited    bool                                      `json:"favourited"`
-		Id            string                                    `json:"id"`
-		ModifiedAt    *string                                   `json:"modifiedAt"`
-		Note          *string                                   `json:"note"`
-		Summary       *string                                   `json:"summary"`
-		TaggingStatus *PatchBookmarksBookmarkId200TaggingStatus `json:"taggingStatus"`
-		Title         *string                                   `json:"title"`
+		Archived            bool                                            `json:"archived"`
+		CreatedAt           string                                          `json:"createdAt"`
+		Favourited          bool                                            `json:"favourited"`
+		Id                  string                                          `json:"id"`
+		ModifiedAt          *string                                         `json:"modifiedAt"`
+		Note                *string                                         `json:"note"`
+		SummarizationStatus *PatchBookmarksBookmarkId200SummarizationStatus `json:"summarizationStatus"`
+		Summary             *string                                         `json:"summary"`
+		TaggingStatus       *PatchBookmarksBookmarkId200TaggingStatus       `json:"taggingStatus"`
+		Title               *string                                         `json:"title"`
 	}
 	JSON404 *struct {
 		Code    string `json:"code"`
 		Message string `json:"message"`
 	}
 }
+type PatchBookmarksBookmarkId200SummarizationStatus string
 type PatchBookmarksBookmarkId200TaggingStatus string
 
 // Status returns HTTPResponse.Status
@@ -2717,21 +2999,23 @@ type PostBookmarksBookmarkIdSummarizeResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
-		Archived      bool                                              `json:"archived"`
-		CreatedAt     string                                            `json:"createdAt"`
-		Favourited    bool                                              `json:"favourited"`
-		Id            string                                            `json:"id"`
-		ModifiedAt    *string                                           `json:"modifiedAt"`
-		Note          *string                                           `json:"note"`
-		Summary       *string                                           `json:"summary"`
-		TaggingStatus *PostBookmarksBookmarkIdSummarize200TaggingStatus `json:"taggingStatus"`
-		Title         *string                                           `json:"title"`
+		Archived            bool                                                    `json:"archived"`
+		CreatedAt           string                                                  `json:"createdAt"`
+		Favourited          bool                                                    `json:"favourited"`
+		Id                  string                                                  `json:"id"`
+		ModifiedAt          *string                                                 `json:"modifiedAt"`
+		Note                *string                                                 `json:"note"`
+		SummarizationStatus *PostBookmarksBookmarkIdSummarize200SummarizationStatus `json:"summarizationStatus"`
+		Summary             *string                                                 `json:"summary"`
+		TaggingStatus       *PostBookmarksBookmarkIdSummarize200TaggingStatus       `json:"taggingStatus"`
+		Title               *string                                                 `json:"title"`
 	}
 	JSON404 *struct {
 		Code    string `json:"code"`
 		Message string `json:"message"`
 	}
 }
+type PostBookmarksBookmarkIdSummarize200SummarizationStatus string
 type PostBookmarksBookmarkIdSummarize200TaggingStatus string
 
 // Status returns HTTPResponse.Status
@@ -3121,11 +3405,7 @@ func (r DeleteListsListIdBookmarksBookmarkIdResponse) StatusCode() int {
 type PutListsListIdBookmarksBookmarkIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *struct {
-		Code    string `json:"code"`
-		Message string `json:"message"`
-	}
-	JSON404 *struct {
+	JSON404      *struct {
 		Code    string `json:"code"`
 		Message string `json:"message"`
 	}
@@ -3165,6 +3445,31 @@ func (r GetTagsResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r GetTagsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostTagsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *struct {
+		Id   string `json:"id"`
+		Name string `json:"name"`
+	}
+}
+
+// Status returns HTTPResponse.Status
+func (r PostTagsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostTagsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -3225,8 +3530,11 @@ func (r GetTagsTagIdResponse) StatusCode() int {
 type PatchTagsTagIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *Tag
-	JSON404      *struct {
+	JSON200      *struct {
+		Id   string `json:"id"`
+		Name string `json:"name"`
+	}
+	JSON404 *struct {
 		Code    string `json:"code"`
 		Message string `json:"message"`
 	}
@@ -3327,6 +3635,24 @@ func (r GetUsersMeStatsResponse) StatusCode() int {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
+}
+
+// PostAssetsWithBodyWithResponse request with arbitrary body returning *PostAssetsResponse
+func (c *ClientWithResponses) PostAssetsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostAssetsResponse, error) {
+	rsp, err := c.PostAssetsWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostAssetsResponse(rsp)
+}
+
+// GetAssetsAssetIdWithResponse request returning *GetAssetsAssetIdResponse
+func (c *ClientWithResponses) GetAssetsAssetIdWithResponse(ctx context.Context, assetId AssetId, reqEditors ...RequestEditorFn) (*GetAssetsAssetIdResponse, error) {
+	rsp, err := c.GetAssetsAssetId(ctx, assetId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetAssetsAssetIdResponse(rsp)
 }
 
 // GetBookmarksWithResponse request returning *GetBookmarksResponse
@@ -3652,6 +3978,23 @@ func (c *ClientWithResponses) GetTagsWithResponse(ctx context.Context, reqEditor
 	return ParseGetTagsResponse(rsp)
 }
 
+// PostTagsWithBodyWithResponse request with arbitrary body returning *PostTagsResponse
+func (c *ClientWithResponses) PostTagsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostTagsResponse, error) {
+	rsp, err := c.PostTagsWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostTagsResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostTagsWithResponse(ctx context.Context, body PostTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*PostTagsResponse, error) {
+	rsp, err := c.PostTags(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostTagsResponse(rsp)
+}
+
 // DeleteTagsTagIdWithResponse request returning *DeleteTagsTagIdResponse
 func (c *ClientWithResponses) DeleteTagsTagIdWithResponse(ctx context.Context, tagId TagId, reqEditors ...RequestEditorFn) (*DeleteTagsTagIdResponse, error) {
 	rsp, err := c.DeleteTagsTagId(ctx, tagId, reqEditors...)
@@ -3712,6 +4055,48 @@ func (c *ClientWithResponses) GetUsersMeStatsWithResponse(ctx context.Context, r
 		return nil, err
 	}
 	return ParseGetUsersMeStatsResponse(rsp)
+}
+
+// ParsePostAssetsResponse parses an HTTP response from a PostAssetsWithResponse call
+func ParsePostAssetsResponse(rsp *http.Response) (*PostAssetsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostAssetsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Asset
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetAssetsAssetIdResponse parses an HTTP response from a GetAssetsAssetIdWithResponse call
+func ParseGetAssetsAssetIdResponse(rsp *http.Response) (*GetAssetsAssetIdResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetAssetsAssetIdResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	return response, nil
 }
 
 // ParseGetBookmarksResponse parses an HTTP response from a GetBookmarksWithResponse call
@@ -3883,15 +4268,16 @@ func ParsePatchBookmarksBookmarkIdResponse(rsp *http.Response) (*PatchBookmarksB
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			Archived      bool                                      `json:"archived"`
-			CreatedAt     string                                    `json:"createdAt"`
-			Favourited    bool                                      `json:"favourited"`
-			Id            string                                    `json:"id"`
-			ModifiedAt    *string                                   `json:"modifiedAt"`
-			Note          *string                                   `json:"note"`
-			Summary       *string                                   `json:"summary"`
-			TaggingStatus *PatchBookmarksBookmarkId200TaggingStatus `json:"taggingStatus"`
-			Title         *string                                   `json:"title"`
+			Archived            bool                                            `json:"archived"`
+			CreatedAt           string                                          `json:"createdAt"`
+			Favourited          bool                                            `json:"favourited"`
+			Id                  string                                          `json:"id"`
+			ModifiedAt          *string                                         `json:"modifiedAt"`
+			Note                *string                                         `json:"note"`
+			SummarizationStatus *PatchBookmarksBookmarkId200SummarizationStatus `json:"summarizationStatus"`
+			Summary             *string                                         `json:"summary"`
+			TaggingStatus       *PatchBookmarksBookmarkId200TaggingStatus       `json:"taggingStatus"`
+			Title               *string                                         `json:"title"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -4064,15 +4450,16 @@ func ParsePostBookmarksBookmarkIdSummarizeResponse(rsp *http.Response) (*PostBoo
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			Archived      bool                                              `json:"archived"`
-			CreatedAt     string                                            `json:"createdAt"`
-			Favourited    bool                                              `json:"favourited"`
-			Id            string                                            `json:"id"`
-			ModifiedAt    *string                                           `json:"modifiedAt"`
-			Note          *string                                           `json:"note"`
-			Summary       *string                                           `json:"summary"`
-			TaggingStatus *PostBookmarksBookmarkIdSummarize200TaggingStatus `json:"taggingStatus"`
-			Title         *string                                           `json:"title"`
+			Archived            bool                                                    `json:"archived"`
+			CreatedAt           string                                                  `json:"createdAt"`
+			Favourited          bool                                                    `json:"favourited"`
+			Id                  string                                                  `json:"id"`
+			ModifiedAt          *string                                                 `json:"modifiedAt"`
+			Note                *string                                                 `json:"note"`
+			SummarizationStatus *PostBookmarksBookmarkIdSummarize200SummarizationStatus `json:"summarizationStatus"`
+			Summary             *string                                                 `json:"summary"`
+			TaggingStatus       *PostBookmarksBookmarkIdSummarize200TaggingStatus       `json:"taggingStatus"`
+			Title               *string                                                 `json:"title"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -4604,16 +4991,6 @@ func ParsePutListsListIdBookmarksBookmarkIdResponse(rsp *http.Response) (*PutLis
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest struct {
-			Code    string `json:"code"`
-			Message string `json:"message"`
-		}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest struct {
 			Code    string `json:"code"`
@@ -4651,6 +5028,35 @@ func ParseGetTagsResponse(rsp *http.Response) (*GetTagsResponse, error) {
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostTagsResponse parses an HTTP response from a PostTagsWithResponse call
+func ParsePostTagsResponse(rsp *http.Response) (*PostTagsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostTagsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest struct {
+			Id   string `json:"id"`
+			Name string `json:"name"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
 
 	}
 
@@ -4737,7 +5143,10 @@ func ParsePatchTagsTagIdResponse(rsp *http.Response) (*PatchTagsTagIdResponse, e
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest Tag
+		var dest struct {
+			Id   string `json:"id"`
+			Name string `json:"name"`
+		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
