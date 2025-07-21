@@ -89,6 +89,11 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// PutAdminUsersUserIdWithBody request with any body
+	PutAdminUsersUserIdWithBody(ctx context.Context, userId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PutAdminUsersUserId(ctx context.Context, userId string, body PutAdminUsersUserIdJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// PostAssetsWithBody request with any body
 	PostAssetsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -220,6 +225,30 @@ type ClientInterface interface {
 
 	// GetUsersMeStats request
 	GetUsersMeStats(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
+
+func (c *Client) PutAdminUsersUserIdWithBody(ctx context.Context, userId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPutAdminUsersUserIdRequestWithBody(c.Server, userId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PutAdminUsersUserId(ctx context.Context, userId string, body PutAdminUsersUserIdJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPutAdminUsersUserIdRequest(c.Server, userId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) PostAssetsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -796,6 +825,53 @@ func (c *Client) GetUsersMeStats(ctx context.Context, reqEditors ...RequestEdito
 		return nil, err
 	}
 	return c.Client.Do(req)
+}
+
+// NewPutAdminUsersUserIdRequest calls the generic PutAdminUsersUserId builder with application/json body
+func NewPutAdminUsersUserIdRequest(server string, userId string, body PutAdminUsersUserIdJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPutAdminUsersUserIdRequestWithBody(server, userId, "application/json", bodyReader)
+}
+
+// NewPutAdminUsersUserIdRequestWithBody generates requests for PutAdminUsersUserId with any type of body
+func NewPutAdminUsersUserIdRequestWithBody(server string, userId string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "userId", runtime.ParamLocationPath, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/admin/users/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
 }
 
 // NewPostAssetsRequestWithBody generates requests for PostAssets with any type of body
@@ -2551,6 +2627,11 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// PutAdminUsersUserIdWithBodyWithResponse request with any body
+	PutAdminUsersUserIdWithBodyWithResponse(ctx context.Context, userId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutAdminUsersUserIdResponse, error)
+
+	PutAdminUsersUserIdWithResponse(ctx context.Context, userId string, body PutAdminUsersUserIdJSONRequestBody, reqEditors ...RequestEditorFn) (*PutAdminUsersUserIdResponse, error)
+
 	// PostAssetsWithBodyWithResponse request with any body
 	PostAssetsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostAssetsResponse, error)
 
@@ -2682,6 +2763,42 @@ type ClientWithResponsesInterface interface {
 
 	// GetUsersMeStatsWithResponse request
 	GetUsersMeStatsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetUsersMeStatsResponse, error)
+}
+
+type PutAdminUsersUserIdResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Success bool `json:"success"`
+	}
+	JSON400 *struct {
+		Error string `json:"error"`
+	}
+	JSON401 *struct {
+		Error string `json:"error"`
+	}
+	JSON403 *struct {
+		Error string `json:"error"`
+	}
+	JSON404 *struct {
+		Error string `json:"error"`
+	}
+}
+
+// Status returns HTTPResponse.Status
+func (r PutAdminUsersUserIdResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PutAdminUsersUserIdResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
 }
 
 type PostAssetsResponse struct {
@@ -3586,9 +3703,10 @@ type GetUsersMeResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
-		Email *string `json:"email"`
-		Id    string  `json:"id"`
-		Name  *string `json:"name"`
+		Email     *string `json:"email"`
+		Id        string  `json:"id"`
+		LocalUser bool    `json:"localUser"`
+		Name      *string `json:"name"`
 	}
 }
 
@@ -3612,12 +3730,44 @@ type GetUsersMeStatsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
+		AssetsByType []struct {
+			Count     float32 `json:"count"`
+			TotalSize float32 `json:"totalSize"`
+			Type      string  `json:"type"`
+		} `json:"assetsByType"`
+		BookmarkingActivity struct {
+			ByDayOfWeek []struct {
+				Count float32 `json:"count"`
+				Day   float32 `json:"day"`
+			} `json:"byDayOfWeek"`
+			ByHour []struct {
+				Count float32 `json:"count"`
+				Hour  float32 `json:"hour"`
+			} `json:"byHour"`
+			ThisMonth float32 `json:"thisMonth"`
+			ThisWeek  float32 `json:"thisWeek"`
+			ThisYear  float32 `json:"thisYear"`
+		} `json:"bookmarkingActivity"`
+		BookmarksByType struct {
+			Asset float32 `json:"asset"`
+			Link  float32 `json:"link"`
+			Text  float32 `json:"text"`
+		} `json:"bookmarksByType"`
 		NumArchived   float32 `json:"numArchived"`
 		NumBookmarks  float32 `json:"numBookmarks"`
 		NumFavorites  float32 `json:"numFavorites"`
 		NumHighlights float32 `json:"numHighlights"`
 		NumLists      float32 `json:"numLists"`
 		NumTags       float32 `json:"numTags"`
+		TagUsage      []struct {
+			Count float32 `json:"count"`
+			Name  string  `json:"name"`
+		} `json:"tagUsage"`
+		TopDomains []struct {
+			Count  float32 `json:"count"`
+			Domain string  `json:"domain"`
+		} `json:"topDomains"`
+		TotalAssetSize float32 `json:"totalAssetSize"`
 	}
 }
 
@@ -3635,6 +3785,23 @@ func (r GetUsersMeStatsResponse) StatusCode() int {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
+}
+
+// PutAdminUsersUserIdWithBodyWithResponse request with arbitrary body returning *PutAdminUsersUserIdResponse
+func (c *ClientWithResponses) PutAdminUsersUserIdWithBodyWithResponse(ctx context.Context, userId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutAdminUsersUserIdResponse, error) {
+	rsp, err := c.PutAdminUsersUserIdWithBody(ctx, userId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePutAdminUsersUserIdResponse(rsp)
+}
+
+func (c *ClientWithResponses) PutAdminUsersUserIdWithResponse(ctx context.Context, userId string, body PutAdminUsersUserIdJSONRequestBody, reqEditors ...RequestEditorFn) (*PutAdminUsersUserIdResponse, error) {
+	rsp, err := c.PutAdminUsersUserId(ctx, userId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePutAdminUsersUserIdResponse(rsp)
 }
 
 // PostAssetsWithBodyWithResponse request with arbitrary body returning *PostAssetsResponse
@@ -4055,6 +4222,70 @@ func (c *ClientWithResponses) GetUsersMeStatsWithResponse(ctx context.Context, r
 		return nil, err
 	}
 	return ParseGetUsersMeStatsResponse(rsp)
+}
+
+// ParsePutAdminUsersUserIdResponse parses an HTTP response from a PutAdminUsersUserIdWithResponse call
+func ParsePutAdminUsersUserIdResponse(rsp *http.Response) (*PutAdminUsersUserIdResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PutAdminUsersUserIdResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Success bool `json:"success"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest struct {
+			Error string `json:"error"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest struct {
+			Error string `json:"error"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest struct {
+			Error string `json:"error"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Error string `json:"error"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, nil
 }
 
 // ParsePostAssetsResponse parses an HTTP response from a PostAssetsWithResponse call
@@ -5219,9 +5450,10 @@ func ParseGetUsersMeResponse(rsp *http.Response) (*GetUsersMeResponse, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			Email *string `json:"email"`
-			Id    string  `json:"id"`
-			Name  *string `json:"name"`
+			Email     *string `json:"email"`
+			Id        string  `json:"id"`
+			LocalUser bool    `json:"localUser"`
+			Name      *string `json:"name"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -5249,12 +5481,44 @@ func ParseGetUsersMeStatsResponse(rsp *http.Response) (*GetUsersMeStatsResponse,
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
+			AssetsByType []struct {
+				Count     float32 `json:"count"`
+				TotalSize float32 `json:"totalSize"`
+				Type      string  `json:"type"`
+			} `json:"assetsByType"`
+			BookmarkingActivity struct {
+				ByDayOfWeek []struct {
+					Count float32 `json:"count"`
+					Day   float32 `json:"day"`
+				} `json:"byDayOfWeek"`
+				ByHour []struct {
+					Count float32 `json:"count"`
+					Hour  float32 `json:"hour"`
+				} `json:"byHour"`
+				ThisMonth float32 `json:"thisMonth"`
+				ThisWeek  float32 `json:"thisWeek"`
+				ThisYear  float32 `json:"thisYear"`
+			} `json:"bookmarkingActivity"`
+			BookmarksByType struct {
+				Asset float32 `json:"asset"`
+				Link  float32 `json:"link"`
+				Text  float32 `json:"text"`
+			} `json:"bookmarksByType"`
 			NumArchived   float32 `json:"numArchived"`
 			NumBookmarks  float32 `json:"numBookmarks"`
 			NumFavorites  float32 `json:"numFavorites"`
 			NumHighlights float32 `json:"numHighlights"`
 			NumLists      float32 `json:"numLists"`
 			NumTags       float32 `json:"numTags"`
+			TagUsage      []struct {
+				Count float32 `json:"count"`
+				Name  string  `json:"name"`
+			} `json:"tagUsage"`
+			TopDomains []struct {
+				Count  float32 `json:"count"`
+				Domain string  `json:"domain"`
+			} `json:"topDomains"`
+			TotalAssetSize float32 `json:"totalAssetSize"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err

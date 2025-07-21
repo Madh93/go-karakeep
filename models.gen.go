@@ -19,6 +19,7 @@ const (
 	BookmarkAssetsAssetTypeBannerImage       BookmarkAssetsAssetType = "bannerImage"
 	BookmarkAssetsAssetTypeBookmarkAsset     BookmarkAssetsAssetType = "bookmarkAsset"
 	BookmarkAssetsAssetTypeFullPageArchive   BookmarkAssetsAssetType = "fullPageArchive"
+	BookmarkAssetsAssetTypeLinkHtmlContent   BookmarkAssetsAssetType = "linkHtmlContent"
 	BookmarkAssetsAssetTypePrecrawledArchive BookmarkAssetsAssetType = "precrawledArchive"
 	BookmarkAssetsAssetTypeScreenshot        BookmarkAssetsAssetType = "screenshot"
 	BookmarkAssetsAssetTypeUnknown           BookmarkAssetsAssetType = "unknown"
@@ -85,10 +86,22 @@ const (
 	ListTypeSmart  ListType = "smart"
 )
 
+// Defines values for PutAdminUsersUserIdJSONBodyRole.
+const (
+	Admin PutAdminUsersUserIdJSONBodyRole = "admin"
+	User  PutAdminUsersUserIdJSONBodyRole = "user"
+)
+
 // Defines values for GetBookmarksParamsSortOrder.
 const (
 	GetBookmarksParamsSortOrderAsc  GetBookmarksParamsSortOrder = "asc"
 	GetBookmarksParamsSortOrderDesc GetBookmarksParamsSortOrder = "desc"
+)
+
+// Defines values for PostBookmarksJSONBodyCrawlPriority.
+const (
+	Low    PostBookmarksJSONBodyCrawlPriority = "low"
+	Normal PostBookmarksJSONBodyCrawlPriority = "normal"
 )
 
 // Defines values for PostBookmarksJSONBody0Type.
@@ -125,6 +138,7 @@ const (
 	BannerImage       PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "bannerImage"
 	BookmarkAsset     PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "bookmarkAsset"
 	FullPageArchive   PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "fullPageArchive"
+	LinkHtmlContent   PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "linkHtmlContent"
 	PrecrawledArchive PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "precrawledArchive"
 	Screenshot        PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "screenshot"
 	Unknown           PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "unknown"
@@ -206,6 +220,7 @@ type BookmarkAssetsAssetType string
 // BookmarkContent0 defines model for .
 type BookmarkContent0 struct {
 	Author                   *string              `json:"author"`
+	ContentAssetId           *string              `json:"contentAssetId"`
 	CrawledAt                *string              `json:"crawledAt"`
 	DateModified             *string              `json:"dateModified"`
 	DatePublished            *string              `json:"datePublished"`
@@ -348,9 +363,20 @@ type Tag struct {
 // TagId defines model for TagId.
 type TagId = string
 
+// PutAdminUsersUserIdJSONBody defines parameters for PutAdminUsersUserId.
+type PutAdminUsersUserIdJSONBody struct {
+	BookmarkQuota          *int                             `json:"bookmarkQuota"`
+	BrowserCrawlingEnabled *bool                            `json:"browserCrawlingEnabled"`
+	Role                   *PutAdminUsersUserIdJSONBodyRole `json:"role,omitempty"`
+	StorageQuota           *int                             `json:"storageQuota"`
+}
+
+// PutAdminUsersUserIdJSONBodyRole defines parameters for PutAdminUsersUserId.
+type PutAdminUsersUserIdJSONBodyRole string
+
 // PostAssetsMultipartBody defines parameters for PostAssets.
 type PostAssetsMultipartBody struct {
-	File *FileToBeUploaded `json:"file,omitempty"`
+	File FileToBeUploaded `json:"file"`
 }
 
 // GetBookmarksParams defines parameters for GetBookmarks.
@@ -370,14 +396,18 @@ type GetBookmarksParamsSortOrder string
 
 // PostBookmarksJSONBody defines parameters for PostBookmarks.
 type PostBookmarksJSONBody struct {
-	Archived   *bool   `json:"archived,omitempty"`
-	CreatedAt  *string `json:"createdAt"`
-	Favourited *bool   `json:"favourited,omitempty"`
-	Note       *string `json:"note,omitempty"`
-	Summary    *string `json:"summary,omitempty"`
-	Title      *string `json:"title"`
-	union      json.RawMessage
+	Archived      *bool                               `json:"archived,omitempty"`
+	CrawlPriority *PostBookmarksJSONBodyCrawlPriority `json:"crawlPriority,omitempty"`
+	CreatedAt     *string                             `json:"createdAt"`
+	Favourited    *bool                               `json:"favourited,omitempty"`
+	Note          *string                             `json:"note,omitempty"`
+	Summary       *string                             `json:"summary,omitempty"`
+	Title         *string                             `json:"title"`
+	union         json.RawMessage
 }
+
+// PostBookmarksJSONBodyCrawlPriority defines parameters for PostBookmarks.
+type PostBookmarksJSONBodyCrawlPriority string
 
 // PostBookmarksJSONBody0 defines parameters for PostBookmarks.
 type PostBookmarksJSONBody0 struct {
@@ -567,6 +597,9 @@ type GetTagsTagIdBookmarksParams struct {
 
 // GetTagsTagIdBookmarksParamsSortOrder defines parameters for GetTagsTagIdBookmarks.
 type GetTagsTagIdBookmarksParamsSortOrder string
+
+// PutAdminUsersUserIdJSONRequestBody defines body for PutAdminUsersUserId for application/json ContentType.
+type PutAdminUsersUserIdJSONRequestBody PutAdminUsersUserIdJSONBody
 
 // PostAssetsMultipartRequestBody defines body for PostAssets for multipart/form-data ContentType.
 type PostAssetsMultipartRequestBody PostAssetsMultipartBody
