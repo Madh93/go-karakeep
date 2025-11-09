@@ -138,6 +138,9 @@ type ClientInterface interface {
 	// GetBookmarksBookmarkIdHighlights request
 	GetBookmarksBookmarkIdHighlights(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// GetBookmarksBookmarkIdLists request
+	GetBookmarksBookmarkIdLists(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// PostBookmarksBookmarkIdSummarize request
 	PostBookmarksBookmarkIdSummarize(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -199,7 +202,7 @@ type ClientInterface interface {
 	PutListsListIdBookmarksBookmarkId(ctx context.Context, listId ListId, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetTags request
-	GetTags(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetTags(ctx context.Context, params *GetTagsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostTagsWithBody request with any body
 	PostTagsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -433,6 +436,18 @@ func (c *Client) PutBookmarksBookmarkIdAssetsAssetId(ctx context.Context, bookma
 
 func (c *Client) GetBookmarksBookmarkIdHighlights(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetBookmarksBookmarkIdHighlightsRequest(c.Server, bookmarkId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetBookmarksBookmarkIdLists(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetBookmarksBookmarkIdListsRequest(c.Server, bookmarkId)
 	if err != nil {
 		return nil, err
 	}
@@ -707,8 +722,8 @@ func (c *Client) PutListsListIdBookmarksBookmarkId(ctx context.Context, listId L
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetTags(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetTagsRequest(c.Server)
+func (c *Client) GetTags(ctx context.Context, params *GetTagsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetTagsRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1528,6 +1543,40 @@ func NewGetBookmarksBookmarkIdHighlightsRequest(server string, bookmarkId Bookma
 	return req, nil
 }
 
+// NewGetBookmarksBookmarkIdListsRequest generates requests for GetBookmarksBookmarkIdLists
+func NewGetBookmarksBookmarkIdListsRequest(server string, bookmarkId BookmarkId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "bookmarkId", runtime.ParamLocationPath, bookmarkId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/bookmarks/%s/lists", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewPostBookmarksBookmarkIdSummarizeRequest generates requests for PostBookmarksBookmarkIdSummarize
 func NewPostBookmarksBookmarkIdSummarizeRequest(server string, bookmarkId BookmarkId) (*http.Request, error) {
 	var err error
@@ -2245,7 +2294,7 @@ func NewPutListsListIdBookmarksBookmarkIdRequest(server string, listId ListId, b
 }
 
 // NewGetTagsRequest generates requests for GetTags
-func NewGetTagsRequest(server string) (*http.Request, error) {
+func NewGetTagsRequest(server string, params *GetTagsParams) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -2261,6 +2310,92 @@ func NewGetTagsRequest(server string) (*http.Request, error) {
 	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.NameContains != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "nameContains", runtime.ParamLocationQuery, *params.NameContains); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Sort != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sort", runtime.ParamLocationQuery, *params.Sort); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.AttachedBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "attachedBy", runtime.ParamLocationQuery, *params.AttachedBy); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Cursor != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "cursor", runtime.ParamLocationQuery, *params.Cursor); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
@@ -2676,6 +2811,9 @@ type ClientWithResponsesInterface interface {
 	// GetBookmarksBookmarkIdHighlightsWithResponse request
 	GetBookmarksBookmarkIdHighlightsWithResponse(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*GetBookmarksBookmarkIdHighlightsResponse, error)
 
+	// GetBookmarksBookmarkIdListsWithResponse request
+	GetBookmarksBookmarkIdListsWithResponse(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*GetBookmarksBookmarkIdListsResponse, error)
+
 	// PostBookmarksBookmarkIdSummarizeWithResponse request
 	PostBookmarksBookmarkIdSummarizeWithResponse(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*PostBookmarksBookmarkIdSummarizeResponse, error)
 
@@ -2737,7 +2875,7 @@ type ClientWithResponsesInterface interface {
 	PutListsListIdBookmarksBookmarkIdWithResponse(ctx context.Context, listId ListId, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*PutListsListIdBookmarksBookmarkIdResponse, error)
 
 	// GetTagsWithResponse request
-	GetTagsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetTagsResponse, error)
+	GetTagsWithResponse(ctx context.Context, params *GetTagsParams, reqEditors ...RequestEditorFn) (*GetTagsResponse, error)
 
 	// PostTagsWithBodyWithResponse request with any body
 	PostTagsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostTagsResponse, error)
@@ -2869,6 +3007,7 @@ func (r GetBookmarksResponse) StatusCode() int {
 type PostBookmarksResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *Bookmark
 	JSON201      *Bookmark
 	JSON400      *struct {
 		Code    string `json:"code"`
@@ -2975,6 +3114,7 @@ type PatchBookmarksBookmarkIdResponse struct {
 		Id                  string                                          `json:"id"`
 		ModifiedAt          *string                                         `json:"modifiedAt"`
 		Note                *string                                         `json:"note"`
+		Source              *PatchBookmarksBookmarkId200Source              `json:"source"`
 		SummarizationStatus *PatchBookmarksBookmarkId200SummarizationStatus `json:"summarizationStatus"`
 		Summary             *string                                         `json:"summary"`
 		TaggingStatus       *PatchBookmarksBookmarkId200TaggingStatus       `json:"taggingStatus"`
@@ -2985,6 +3125,7 @@ type PatchBookmarksBookmarkIdResponse struct {
 		Message string `json:"message"`
 	}
 }
+type PatchBookmarksBookmarkId200Source string
 type PatchBookmarksBookmarkId200SummarizationStatus string
 type PatchBookmarksBookmarkId200TaggingStatus string
 
@@ -3009,6 +3150,7 @@ type PostBookmarksBookmarkIdAssetsResponse struct {
 	HTTPResponse *http.Response
 	JSON201      *struct {
 		AssetType PostBookmarksBookmarkIdAssets201AssetType `json:"assetType"`
+		FileName  *string                                   `json:"fileName"`
 		Id        string                                    `json:"id"`
 	}
 	JSON404 *struct {
@@ -3112,6 +3254,34 @@ func (r GetBookmarksBookmarkIdHighlightsResponse) StatusCode() int {
 	return 0
 }
 
+type GetBookmarksBookmarkIdListsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Lists []List `json:"lists"`
+	}
+	JSON404 *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+}
+
+// Status returns HTTPResponse.Status
+func (r GetBookmarksBookmarkIdListsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetBookmarksBookmarkIdListsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type PostBookmarksBookmarkIdSummarizeResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -3122,6 +3292,7 @@ type PostBookmarksBookmarkIdSummarizeResponse struct {
 		Id                  string                                                  `json:"id"`
 		ModifiedAt          *string                                                 `json:"modifiedAt"`
 		Note                *string                                                 `json:"note"`
+		Source              *PostBookmarksBookmarkIdSummarize200Source              `json:"source"`
 		SummarizationStatus *PostBookmarksBookmarkIdSummarize200SummarizationStatus `json:"summarizationStatus"`
 		Summary             *string                                                 `json:"summary"`
 		TaggingStatus       *PostBookmarksBookmarkIdSummarize200TaggingStatus       `json:"taggingStatus"`
@@ -3132,6 +3303,7 @@ type PostBookmarksBookmarkIdSummarizeResponse struct {
 		Message string `json:"message"`
 	}
 }
+type PostBookmarksBookmarkIdSummarize200Source string
 type PostBookmarksBookmarkIdSummarize200SummarizationStatus string
 type PostBookmarksBookmarkIdSummarize200TaggingStatus string
 
@@ -3548,7 +3720,8 @@ type GetTagsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
-		Tags []Tag `json:"tags"`
+		NextCursor *string `json:"nextCursor"`
+		Tags       []Tag   `json:"tags"`
 	}
 }
 
@@ -3944,6 +4117,15 @@ func (c *ClientWithResponses) GetBookmarksBookmarkIdHighlightsWithResponse(ctx c
 	return ParseGetBookmarksBookmarkIdHighlightsResponse(rsp)
 }
 
+// GetBookmarksBookmarkIdListsWithResponse request returning *GetBookmarksBookmarkIdListsResponse
+func (c *ClientWithResponses) GetBookmarksBookmarkIdListsWithResponse(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*GetBookmarksBookmarkIdListsResponse, error) {
+	rsp, err := c.GetBookmarksBookmarkIdLists(ctx, bookmarkId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetBookmarksBookmarkIdListsResponse(rsp)
+}
+
 // PostBookmarksBookmarkIdSummarizeWithResponse request returning *PostBookmarksBookmarkIdSummarizeResponse
 func (c *ClientWithResponses) PostBookmarksBookmarkIdSummarizeWithResponse(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*PostBookmarksBookmarkIdSummarizeResponse, error) {
 	rsp, err := c.PostBookmarksBookmarkIdSummarize(ctx, bookmarkId, reqEditors...)
@@ -4137,8 +4319,8 @@ func (c *ClientWithResponses) PutListsListIdBookmarksBookmarkIdWithResponse(ctx 
 }
 
 // GetTagsWithResponse request returning *GetTagsResponse
-func (c *ClientWithResponses) GetTagsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetTagsResponse, error) {
-	rsp, err := c.GetTags(ctx, reqEditors...)
+func (c *ClientWithResponses) GetTagsWithResponse(ctx context.Context, params *GetTagsParams, reqEditors ...RequestEditorFn) (*GetTagsResponse, error) {
+	rsp, err := c.GetTags(ctx, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -4370,6 +4552,13 @@ func ParsePostBookmarksResponse(rsp *http.Response) (*PostBookmarksResponse, err
 	}
 
 	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Bookmark
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
 		var dest Bookmark
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -4505,6 +4694,7 @@ func ParsePatchBookmarksBookmarkIdResponse(rsp *http.Response) (*PatchBookmarksB
 			Id                  string                                          `json:"id"`
 			ModifiedAt          *string                                         `json:"modifiedAt"`
 			Note                *string                                         `json:"note"`
+			Source              *PatchBookmarksBookmarkId200Source              `json:"source"`
 			SummarizationStatus *PatchBookmarksBookmarkId200SummarizationStatus `json:"summarizationStatus"`
 			Summary             *string                                         `json:"summary"`
 			TaggingStatus       *PatchBookmarksBookmarkId200TaggingStatus       `json:"taggingStatus"`
@@ -4547,6 +4737,7 @@ func ParsePostBookmarksBookmarkIdAssetsResponse(rsp *http.Response) (*PostBookma
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
 		var dest struct {
 			AssetType PostBookmarksBookmarkIdAssets201AssetType `json:"assetType"`
+			FileName  *string                                   `json:"fileName"`
 			Id        string                                    `json:"id"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -4665,6 +4856,44 @@ func ParseGetBookmarksBookmarkIdHighlightsResponse(rsp *http.Response) (*GetBook
 	return response, nil
 }
 
+// ParseGetBookmarksBookmarkIdListsResponse parses an HTTP response from a GetBookmarksBookmarkIdListsWithResponse call
+func ParseGetBookmarksBookmarkIdListsResponse(rsp *http.Response) (*GetBookmarksBookmarkIdListsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetBookmarksBookmarkIdListsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Lists []List `json:"lists"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParsePostBookmarksBookmarkIdSummarizeResponse parses an HTTP response from a PostBookmarksBookmarkIdSummarizeWithResponse call
 func ParsePostBookmarksBookmarkIdSummarizeResponse(rsp *http.Response) (*PostBookmarksBookmarkIdSummarizeResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -4687,6 +4916,7 @@ func ParsePostBookmarksBookmarkIdSummarizeResponse(rsp *http.Response) (*PostBoo
 			Id                  string                                                  `json:"id"`
 			ModifiedAt          *string                                                 `json:"modifiedAt"`
 			Note                *string                                                 `json:"note"`
+			Source              *PostBookmarksBookmarkIdSummarize200Source              `json:"source"`
 			SummarizationStatus *PostBookmarksBookmarkIdSummarize200SummarizationStatus `json:"summarizationStatus"`
 			Summary             *string                                                 `json:"summary"`
 			TaggingStatus       *PostBookmarksBookmarkIdSummarize200TaggingStatus       `json:"taggingStatus"`
@@ -5253,7 +5483,8 @@ func ParseGetTagsResponse(rsp *http.Response) (*GetTagsResponse, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			Tags []Tag `json:"tags"`
+			NextCursor *string `json:"nextCursor"`
+			Tags       []Tag   `json:"tags"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
