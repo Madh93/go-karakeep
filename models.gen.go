@@ -23,6 +23,7 @@ const (
 	BookmarkAssetsAssetTypePrecrawledArchive BookmarkAssetsAssetType = "precrawledArchive"
 	BookmarkAssetsAssetTypeScreenshot        BookmarkAssetsAssetType = "screenshot"
 	BookmarkAssetsAssetTypeUnknown           BookmarkAssetsAssetType = "unknown"
+	BookmarkAssetsAssetTypeUserUploaded      BookmarkAssetsAssetType = "userUploaded"
 	BookmarkAssetsAssetTypeVideo             BookmarkAssetsAssetType = "video"
 )
 
@@ -52,6 +53,18 @@ const (
 	BookmarkContent3TypeUnknown BookmarkContent3Type = "unknown"
 )
 
+// Defines values for BookmarkSource.
+const (
+	BookmarkSourceApi        BookmarkSource = "api"
+	BookmarkSourceCli        BookmarkSource = "cli"
+	BookmarkSourceExtension  BookmarkSource = "extension"
+	BookmarkSourceImport     BookmarkSource = "import"
+	BookmarkSourceMobile     BookmarkSource = "mobile"
+	BookmarkSourceRss        BookmarkSource = "rss"
+	BookmarkSourceSinglefile BookmarkSource = "singlefile"
+	BookmarkSourceWeb        BookmarkSource = "web"
+)
+
 // Defines values for BookmarkSummarizationStatus.
 const (
 	BookmarkSummarizationStatusFailure BookmarkSummarizationStatus = "failure"
@@ -68,8 +81,8 @@ const (
 
 // Defines values for BookmarkTagsAttachedBy.
 const (
-	Ai    BookmarkTagsAttachedBy = "ai"
-	Human BookmarkTagsAttachedBy = "human"
+	BookmarkTagsAttachedByAi    BookmarkTagsAttachedBy = "ai"
+	BookmarkTagsAttachedByHuman BookmarkTagsAttachedBy = "human"
 )
 
 // Defines values for HighlightColor.
@@ -102,6 +115,18 @@ const (
 const (
 	Low    PostBookmarksJSONBodyCrawlPriority = "low"
 	Normal PostBookmarksJSONBodyCrawlPriority = "normal"
+)
+
+// Defines values for PostBookmarksJSONBodySource.
+const (
+	PostBookmarksJSONBodySourceApi        PostBookmarksJSONBodySource = "api"
+	PostBookmarksJSONBodySourceCli        PostBookmarksJSONBodySource = "cli"
+	PostBookmarksJSONBodySourceExtension  PostBookmarksJSONBodySource = "extension"
+	PostBookmarksJSONBodySourceImport     PostBookmarksJSONBodySource = "import"
+	PostBookmarksJSONBodySourceMobile     PostBookmarksJSONBodySource = "mobile"
+	PostBookmarksJSONBodySourceRss        PostBookmarksJSONBodySource = "rss"
+	PostBookmarksJSONBodySourceSinglefile PostBookmarksJSONBodySource = "singlefile"
+	PostBookmarksJSONBodySourceWeb        PostBookmarksJSONBodySource = "web"
 )
 
 // Defines values for PostBookmarksJSONBody0Type.
@@ -142,6 +167,7 @@ const (
 	PrecrawledArchive PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "precrawledArchive"
 	Screenshot        PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "screenshot"
 	Unknown           PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "unknown"
+	UserUploaded      PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "userUploaded"
 	Video             PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "video"
 )
 
@@ -173,6 +199,20 @@ const (
 	GetListsListIdBookmarksParamsSortOrderDesc GetListsListIdBookmarksParamsSortOrder = "desc"
 )
 
+// Defines values for GetTagsParamsSort.
+const (
+	Name      GetTagsParamsSort = "name"
+	Relevance GetTagsParamsSort = "relevance"
+	Usage     GetTagsParamsSort = "usage"
+)
+
+// Defines values for GetTagsParamsAttachedBy.
+const (
+	GetTagsParamsAttachedByAi    GetTagsParamsAttachedBy = "ai"
+	GetTagsParamsAttachedByHuman GetTagsParamsAttachedBy = "human"
+	GetTagsParamsAttachedByNone  GetTagsParamsAttachedBy = "none"
+)
+
 // Defines values for GetTagsTagIdBookmarksParamsSortOrder.
 const (
 	GetTagsTagIdBookmarksParamsSortOrderAsc  GetTagsTagIdBookmarksParamsSortOrder = "asc"
@@ -195,6 +235,7 @@ type Bookmark struct {
 	Archived bool `json:"archived"`
 	Assets   []struct {
 		AssetType BookmarkAssetsAssetType `json:"assetType"`
+		FileName  *string                 `json:"fileName"`
 		Id        string                  `json:"id"`
 	} `json:"assets"`
 	Content             Bookmark_Content             `json:"content"`
@@ -203,6 +244,7 @@ type Bookmark struct {
 	Id                  string                       `json:"id"`
 	ModifiedAt          *string                      `json:"modifiedAt"`
 	Note                *string                      `json:"note"`
+	Source              *BookmarkSource              `json:"source"`
 	SummarizationStatus *BookmarkSummarizationStatus `json:"summarizationStatus"`
 	Summary             *string                      `json:"summary"`
 	TaggingStatus       *BookmarkTaggingStatus       `json:"taggingStatus"`
@@ -281,6 +323,9 @@ type BookmarkContent3Type string
 type Bookmark_Content struct {
 	union json.RawMessage
 }
+
+// BookmarkSource defines model for Bookmark.Source.
+type BookmarkSource string
 
 // BookmarkSummarizationStatus defines model for Bookmark.SummarizationStatus.
 type BookmarkSummarizationStatus string
@@ -396,18 +441,23 @@ type GetBookmarksParamsSortOrder string
 
 // PostBookmarksJSONBody defines parameters for PostBookmarks.
 type PostBookmarksJSONBody struct {
-	Archived      *bool                               `json:"archived,omitempty"`
-	CrawlPriority *PostBookmarksJSONBodyCrawlPriority `json:"crawlPriority,omitempty"`
-	CreatedAt     *string                             `json:"createdAt"`
-	Favourited    *bool                               `json:"favourited,omitempty"`
-	Note          *string                             `json:"note,omitempty"`
-	Summary       *string                             `json:"summary,omitempty"`
-	Title         *string                             `json:"title"`
-	union         json.RawMessage
+	Archived        *bool                               `json:"archived,omitempty"`
+	CrawlPriority   *PostBookmarksJSONBodyCrawlPriority `json:"crawlPriority,omitempty"`
+	CreatedAt       *string                             `json:"createdAt"`
+	Favourited      *bool                               `json:"favourited,omitempty"`
+	ImportSessionId *string                             `json:"importSessionId,omitempty"`
+	Note            *string                             `json:"note,omitempty"`
+	Source          *PostBookmarksJSONBodySource        `json:"source,omitempty"`
+	Summary         *string                             `json:"summary,omitempty"`
+	Title           *string                             `json:"title"`
+	union           json.RawMessage
 }
 
 // PostBookmarksJSONBodyCrawlPriority defines parameters for PostBookmarks.
 type PostBookmarksJSONBodyCrawlPriority string
+
+// PostBookmarksJSONBodySource defines parameters for PostBookmarks.
+type PostBookmarksJSONBodySource string
 
 // PostBookmarksJSONBody0 defines parameters for PostBookmarks.
 type PostBookmarksJSONBody0 struct {
@@ -574,6 +624,21 @@ type GetListsListIdBookmarksParams struct {
 
 // GetListsListIdBookmarksParamsSortOrder defines parameters for GetListsListIdBookmarks.
 type GetListsListIdBookmarksParamsSortOrder string
+
+// GetTagsParams defines parameters for GetTags.
+type GetTagsParams struct {
+	NameContains *string                  `form:"nameContains,omitempty" json:"nameContains,omitempty"`
+	Sort         *GetTagsParamsSort       `form:"sort,omitempty" json:"sort,omitempty"`
+	AttachedBy   *GetTagsParamsAttachedBy `form:"attachedBy,omitempty" json:"attachedBy,omitempty"`
+	Cursor       *string                  `form:"cursor,omitempty" json:"cursor,omitempty"`
+	Limit        *float32                 `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
+// GetTagsParamsSort defines parameters for GetTags.
+type GetTagsParamsSort string
+
+// GetTagsParamsAttachedBy defines parameters for GetTags.
+type GetTagsParamsAttachedBy string
 
 // PostTagsJSONBody defines parameters for PostTags.
 type PostTagsJSONBody struct {
