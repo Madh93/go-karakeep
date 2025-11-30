@@ -100,6 +100,21 @@ type ClientInterface interface {
 	// GetAssetsAssetId request
 	GetAssetsAssetId(ctx context.Context, assetId AssetId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// GetBackups request
+	GetBackups(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostBackups request
+	PostBackups(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteBackupsBackupId request
+	DeleteBackupsBackupId(ctx context.Context, backupId BackupId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetBackupsBackupId request
+	GetBackupsBackupId(ctx context.Context, backupId BackupId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetBackupsBackupIdDownload request
+	GetBackupsBackupIdDownload(ctx context.Context, backupId BackupId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetBookmarks request
 	GetBookmarks(ctx context.Context, params *GetBookmarksParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -268,6 +283,66 @@ func (c *Client) PostAssetsWithBody(ctx context.Context, contentType string, bod
 
 func (c *Client) GetAssetsAssetId(ctx context.Context, assetId AssetId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetAssetsAssetIdRequest(c.Server, assetId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetBackups(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetBackupsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostBackups(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostBackupsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteBackupsBackupId(ctx context.Context, backupId BackupId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteBackupsBackupIdRequest(c.Server, backupId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetBackupsBackupId(ctx context.Context, backupId BackupId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetBackupsBackupIdRequest(c.Server, backupId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetBackupsBackupIdDownload(ctx context.Context, backupId BackupId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetBackupsBackupIdDownloadRequest(c.Server, backupId)
 	if err != nil {
 		return nil, err
 	}
@@ -935,6 +1010,162 @@ func NewGetAssetsAssetIdRequest(server string, assetId AssetId) (*http.Request, 
 	}
 
 	operationPath := fmt.Sprintf("/assets/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetBackupsRequest generates requests for GetBackups
+func NewGetBackupsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/backups")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPostBackupsRequest generates requests for PostBackups
+func NewPostBackupsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/backups")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewDeleteBackupsBackupIdRequest generates requests for DeleteBackupsBackupId
+func NewDeleteBackupsBackupIdRequest(server string, backupId BackupId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "backupId", runtime.ParamLocationPath, backupId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/backups/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetBackupsBackupIdRequest generates requests for GetBackupsBackupId
+func NewGetBackupsBackupIdRequest(server string, backupId BackupId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "backupId", runtime.ParamLocationPath, backupId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/backups/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetBackupsBackupIdDownloadRequest generates requests for GetBackupsBackupIdDownload
+func NewGetBackupsBackupIdDownloadRequest(server string, backupId BackupId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "backupId", runtime.ParamLocationPath, backupId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/backups/%s/download", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2773,6 +3004,21 @@ type ClientWithResponsesInterface interface {
 	// GetAssetsAssetIdWithResponse request
 	GetAssetsAssetIdWithResponse(ctx context.Context, assetId AssetId, reqEditors ...RequestEditorFn) (*GetAssetsAssetIdResponse, error)
 
+	// GetBackupsWithResponse request
+	GetBackupsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetBackupsResponse, error)
+
+	// PostBackupsWithResponse request
+	PostBackupsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*PostBackupsResponse, error)
+
+	// DeleteBackupsBackupIdWithResponse request
+	DeleteBackupsBackupIdWithResponse(ctx context.Context, backupId BackupId, reqEditors ...RequestEditorFn) (*DeleteBackupsBackupIdResponse, error)
+
+	// GetBackupsBackupIdWithResponse request
+	GetBackupsBackupIdWithResponse(ctx context.Context, backupId BackupId, reqEditors ...RequestEditorFn) (*GetBackupsBackupIdResponse, error)
+
+	// GetBackupsBackupIdDownloadWithResponse request
+	GetBackupsBackupIdDownloadWithResponse(ctx context.Context, backupId BackupId, reqEditors ...RequestEditorFn) (*GetBackupsBackupIdDownloadResponse, error)
+
 	// GetBookmarksWithResponse request
 	GetBookmarksWithResponse(ctx context.Context, params *GetBookmarksParams, reqEditors ...RequestEditorFn) (*GetBookmarksResponse, error)
 
@@ -2982,6 +3228,158 @@ func (r GetAssetsAssetIdResponse) StatusCode() int {
 	return 0
 }
 
+type GetBackupsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Backups []struct {
+			AssetId       *string                    `json:"assetId"`
+			BookmarkCount float32                    `json:"bookmarkCount"`
+			CreatedAt     string                     `json:"createdAt"`
+			ErrorMessage  *string                    `json:"errorMessage"`
+			Id            string                     `json:"id"`
+			Size          float32                    `json:"size"`
+			Status        GetBackups200BackupsStatus `json:"status"`
+			UserId        string                     `json:"userId"`
+		} `json:"backups"`
+	}
+}
+type GetBackups200BackupsStatus string
+
+// Status returns HTTPResponse.Status
+func (r GetBackupsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetBackupsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostBackupsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *struct {
+		AssetId       *string              `json:"assetId"`
+		BookmarkCount float32              `json:"bookmarkCount"`
+		CreatedAt     string               `json:"createdAt"`
+		ErrorMessage  *string              `json:"errorMessage"`
+		Id            string               `json:"id"`
+		Size          float32              `json:"size"`
+		Status        PostBackups201Status `json:"status"`
+		UserId        string               `json:"userId"`
+	}
+}
+type PostBackups201Status string
+
+// Status returns HTTPResponse.Status
+func (r PostBackupsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostBackupsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteBackupsBackupIdResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteBackupsBackupIdResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteBackupsBackupIdResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetBackupsBackupIdResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		AssetId       *string                     `json:"assetId"`
+		BookmarkCount float32                     `json:"bookmarkCount"`
+		CreatedAt     string                      `json:"createdAt"`
+		ErrorMessage  *string                     `json:"errorMessage"`
+		Id            string                      `json:"id"`
+		Size          float32                     `json:"size"`
+		Status        GetBackupsBackupId200Status `json:"status"`
+		UserId        string                      `json:"userId"`
+	}
+	JSON404 *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+}
+type GetBackupsBackupId200Status string
+
+// Status returns HTTPResponse.Status
+func (r GetBackupsBackupIdResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetBackupsBackupIdResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetBackupsBackupIdDownloadResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON404      *struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+}
+
+// Status returns HTTPResponse.Status
+func (r GetBackupsBackupIdDownloadResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetBackupsBackupIdDownloadResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type GetBookmarksResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -3119,6 +3517,7 @@ type PatchBookmarksBookmarkIdResponse struct {
 		Summary             *string                                         `json:"summary"`
 		TaggingStatus       *PatchBookmarksBookmarkId200TaggingStatus       `json:"taggingStatus"`
 		Title               *string                                         `json:"title"`
+		UserId              string                                          `json:"userId"`
 	}
 	JSON404 *struct {
 		Code    string `json:"code"`
@@ -3297,6 +3696,7 @@ type PostBookmarksBookmarkIdSummarizeResponse struct {
 		Summary             *string                                                 `json:"summary"`
 		TaggingStatus       *PostBookmarksBookmarkIdSummarize200TaggingStatus       `json:"taggingStatus"`
 		Title               *string                                                 `json:"title"`
+		UserId              string                                                  `json:"userId"`
 	}
 	JSON404 *struct {
 		Code    string `json:"code"`
@@ -3921,6 +4321,10 @@ type GetUsersMeStatsResponse struct {
 			ThisWeek  float32 `json:"thisWeek"`
 			ThisYear  float32 `json:"thisYear"`
 		} `json:"bookmarkingActivity"`
+		BookmarksBySource []struct {
+			Count  float32                                    `json:"count"`
+			Source *GetUsersMeStats200BookmarksBySourceSource `json:"source"`
+		} `json:"bookmarksBySource"`
 		BookmarksByType struct {
 			Asset float32 `json:"asset"`
 			Link  float32 `json:"link"`
@@ -3943,6 +4347,7 @@ type GetUsersMeStatsResponse struct {
 		TotalAssetSize float32 `json:"totalAssetSize"`
 	}
 }
+type GetUsersMeStats200BookmarksBySourceSource string
 
 // Status returns HTTPResponse.Status
 func (r GetUsersMeStatsResponse) Status() string {
@@ -3993,6 +4398,51 @@ func (c *ClientWithResponses) GetAssetsAssetIdWithResponse(ctx context.Context, 
 		return nil, err
 	}
 	return ParseGetAssetsAssetIdResponse(rsp)
+}
+
+// GetBackupsWithResponse request returning *GetBackupsResponse
+func (c *ClientWithResponses) GetBackupsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetBackupsResponse, error) {
+	rsp, err := c.GetBackups(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetBackupsResponse(rsp)
+}
+
+// PostBackupsWithResponse request returning *PostBackupsResponse
+func (c *ClientWithResponses) PostBackupsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*PostBackupsResponse, error) {
+	rsp, err := c.PostBackups(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostBackupsResponse(rsp)
+}
+
+// DeleteBackupsBackupIdWithResponse request returning *DeleteBackupsBackupIdResponse
+func (c *ClientWithResponses) DeleteBackupsBackupIdWithResponse(ctx context.Context, backupId BackupId, reqEditors ...RequestEditorFn) (*DeleteBackupsBackupIdResponse, error) {
+	rsp, err := c.DeleteBackupsBackupId(ctx, backupId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteBackupsBackupIdResponse(rsp)
+}
+
+// GetBackupsBackupIdWithResponse request returning *GetBackupsBackupIdResponse
+func (c *ClientWithResponses) GetBackupsBackupIdWithResponse(ctx context.Context, backupId BackupId, reqEditors ...RequestEditorFn) (*GetBackupsBackupIdResponse, error) {
+	rsp, err := c.GetBackupsBackupId(ctx, backupId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetBackupsBackupIdResponse(rsp)
+}
+
+// GetBackupsBackupIdDownloadWithResponse request returning *GetBackupsBackupIdDownloadResponse
+func (c *ClientWithResponses) GetBackupsBackupIdDownloadWithResponse(ctx context.Context, backupId BackupId, reqEditors ...RequestEditorFn) (*GetBackupsBackupIdDownloadResponse, error) {
+	rsp, err := c.GetBackupsBackupIdDownload(ctx, backupId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetBackupsBackupIdDownloadResponse(rsp)
 }
 
 // GetBookmarksWithResponse request returning *GetBookmarksResponse
@@ -4512,6 +4962,181 @@ func ParseGetAssetsAssetIdResponse(rsp *http.Response) (*GetAssetsAssetIdRespons
 	return response, nil
 }
 
+// ParseGetBackupsResponse parses an HTTP response from a GetBackupsWithResponse call
+func ParseGetBackupsResponse(rsp *http.Response) (*GetBackupsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetBackupsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Backups []struct {
+				AssetId       *string                    `json:"assetId"`
+				BookmarkCount float32                    `json:"bookmarkCount"`
+				CreatedAt     string                     `json:"createdAt"`
+				ErrorMessage  *string                    `json:"errorMessage"`
+				Id            string                     `json:"id"`
+				Size          float32                    `json:"size"`
+				Status        GetBackups200BackupsStatus `json:"status"`
+				UserId        string                     `json:"userId"`
+			} `json:"backups"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostBackupsResponse parses an HTTP response from a PostBackupsWithResponse call
+func ParsePostBackupsResponse(rsp *http.Response) (*PostBackupsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostBackupsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest struct {
+			AssetId       *string              `json:"assetId"`
+			BookmarkCount float32              `json:"bookmarkCount"`
+			CreatedAt     string               `json:"createdAt"`
+			ErrorMessage  *string              `json:"errorMessage"`
+			Id            string               `json:"id"`
+			Size          float32              `json:"size"`
+			Status        PostBackups201Status `json:"status"`
+			UserId        string               `json:"userId"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteBackupsBackupIdResponse parses an HTTP response from a DeleteBackupsBackupIdWithResponse call
+func ParseDeleteBackupsBackupIdResponse(rsp *http.Response) (*DeleteBackupsBackupIdResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteBackupsBackupIdResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetBackupsBackupIdResponse parses an HTTP response from a GetBackupsBackupIdWithResponse call
+func ParseGetBackupsBackupIdResponse(rsp *http.Response) (*GetBackupsBackupIdResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetBackupsBackupIdResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			AssetId       *string                     `json:"assetId"`
+			BookmarkCount float32                     `json:"bookmarkCount"`
+			CreatedAt     string                      `json:"createdAt"`
+			ErrorMessage  *string                     `json:"errorMessage"`
+			Id            string                      `json:"id"`
+			Size          float32                     `json:"size"`
+			Status        GetBackupsBackupId200Status `json:"status"`
+			UserId        string                      `json:"userId"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetBackupsBackupIdDownloadResponse parses an HTTP response from a GetBackupsBackupIdDownloadWithResponse call
+func ParseGetBackupsBackupIdDownloadResponse(rsp *http.Response) (*GetBackupsBackupIdDownloadResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetBackupsBackupIdDownloadResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseGetBookmarksResponse parses an HTTP response from a GetBookmarksWithResponse call
 func ParseGetBookmarksResponse(rsp *http.Response) (*GetBookmarksResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -4699,6 +5324,7 @@ func ParsePatchBookmarksBookmarkIdResponse(rsp *http.Response) (*PatchBookmarksB
 			Summary             *string                                         `json:"summary"`
 			TaggingStatus       *PatchBookmarksBookmarkId200TaggingStatus       `json:"taggingStatus"`
 			Title               *string                                         `json:"title"`
+			UserId              string                                          `json:"userId"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -4921,6 +5547,7 @@ func ParsePostBookmarksBookmarkIdSummarizeResponse(rsp *http.Response) (*PostBoo
 			Summary             *string                                                 `json:"summary"`
 			TaggingStatus       *PostBookmarksBookmarkIdSummarize200TaggingStatus       `json:"taggingStatus"`
 			Title               *string                                                 `json:"title"`
+			UserId              string                                                  `json:"userId"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -5730,6 +6357,10 @@ func ParseGetUsersMeStatsResponse(rsp *http.Response) (*GetUsersMeStatsResponse,
 				ThisWeek  float32 `json:"thisWeek"`
 				ThisYear  float32 `json:"thisYear"`
 			} `json:"bookmarkingActivity"`
+			BookmarksBySource []struct {
+				Count  float32                                    `json:"count"`
+				Source *GetUsersMeStats200BookmarksBySourceSource `json:"source"`
+			} `json:"bookmarksBySource"`
 			BookmarksByType struct {
 				Asset float32 `json:"asset"`
 				Link  float32 `json:"link"`

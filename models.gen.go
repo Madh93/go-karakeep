@@ -99,6 +99,14 @@ const (
 	ListTypeSmart  ListType = "smart"
 )
 
+// Defines values for ListUserRole.
+const (
+	Editor ListUserRole = "editor"
+	Owner  ListUserRole = "owner"
+	Public ListUserRole = "public"
+	Viewer ListUserRole = "viewer"
+)
+
 // Defines values for PutAdminUsersUserIdJSONBodyRole.
 const (
 	Admin PutAdminUsersUserIdJSONBodyRole = "admin"
@@ -230,6 +238,9 @@ type Asset struct {
 // AssetId defines model for AssetId.
 type AssetId = string
 
+// BackupId defines model for BackupId.
+type BackupId = string
+
 // Bookmark defines model for Bookmark.
 type Bookmark struct {
 	Archived bool `json:"archived"`
@@ -253,7 +264,8 @@ type Bookmark struct {
 		Id         string                 `json:"id"`
 		Name       string                 `json:"name"`
 	} `json:"tags"`
-	Title *string `json:"title"`
+	Title  *string `json:"title"`
+	UserId string  `json:"userId"`
 }
 
 // BookmarkAssetsAssetType defines model for Bookmark.Assets.AssetType.
@@ -366,18 +378,23 @@ type HighlightId = string
 
 // List defines model for List.
 type List struct {
-	Description *string   `json:"description"`
-	Icon        string    `json:"icon"`
-	Id          string    `json:"id"`
-	Name        string    `json:"name"`
-	ParentId    *string   `json:"parentId"`
-	Public      bool      `json:"public"`
-	Query       *string   `json:"query"`
-	Type        *ListType `json:"type,omitempty"`
+	Description      *string      `json:"description"`
+	HasCollaborators bool         `json:"hasCollaborators"`
+	Icon             string       `json:"icon"`
+	Id               string       `json:"id"`
+	Name             string       `json:"name"`
+	ParentId         *string      `json:"parentId"`
+	Public           bool         `json:"public"`
+	Query            *string      `json:"query"`
+	Type             *ListType    `json:"type,omitempty"`
+	UserRole         ListUserRole `json:"userRole"`
 }
 
 // ListType defines model for List.Type.
 type ListType string
+
+// ListUserRole defines model for List.UserRole.
+type ListUserRole string
 
 // ListId defines model for ListId.
 type ListId = string
@@ -584,6 +601,7 @@ type PostHighlightsJSONBodyColor string
 // PatchHighlightsHighlightIdJSONBody defines parameters for PatchHighlightsHighlightId.
 type PatchHighlightsHighlightIdJSONBody struct {
 	Color *PatchHighlightsHighlightIdJSONBodyColor `json:"color,omitempty"`
+	Note  *string                                  `json:"note"`
 }
 
 // PatchHighlightsHighlightIdJSONBodyColor defines parameters for PatchHighlightsHighlightId.
