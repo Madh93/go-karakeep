@@ -1,7 +1,7 @@
 version: "3"
 
 vars:
-  KARAKEEP_VERSION: v0.29.1
+  KARAKEEP_VERSION: v0.29.2
 
 tasks:
   default:
