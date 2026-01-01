@@ -4278,6 +4278,7 @@ type GetUsersMeResponse struct {
 	JSON200      *struct {
 		Email     *string `json:"email"`
 		Id        string  `json:"id"`
+		Image     *string `json:"image"`
 		LocalUser bool    `json:"localUser"`
 		Name      *string `json:"name"`
 	}
@@ -6310,6 +6311,7 @@ func ParseGetUsersMeResponse(rsp *http.Response) (*GetUsersMeResponse, error) {
 		var dest struct {
 			Email     *string `json:"email"`
 			Id        string  `json:"id"`
+			Image     *string `json:"image"`
 			LocalUser bool    `json:"localUser"`
 			Name      *string `json:"name"`
 		}
