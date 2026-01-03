@@ -16,15 +16,24 @@ const (
 // Defines values for BookmarkAssetsAssetType.
 const (
 	BookmarkAssetsAssetTypeAssetScreenshot   BookmarkAssetsAssetType = "assetScreenshot"
+	BookmarkAssetsAssetTypeAvatar            BookmarkAssetsAssetType = "avatar"
 	BookmarkAssetsAssetTypeBannerImage       BookmarkAssetsAssetType = "bannerImage"
 	BookmarkAssetsAssetTypeBookmarkAsset     BookmarkAssetsAssetType = "bookmarkAsset"
 	BookmarkAssetsAssetTypeFullPageArchive   BookmarkAssetsAssetType = "fullPageArchive"
 	BookmarkAssetsAssetTypeLinkHtmlContent   BookmarkAssetsAssetType = "linkHtmlContent"
+	BookmarkAssetsAssetTypePdf               BookmarkAssetsAssetType = "pdf"
 	BookmarkAssetsAssetTypePrecrawledArchive BookmarkAssetsAssetType = "precrawledArchive"
 	BookmarkAssetsAssetTypeScreenshot        BookmarkAssetsAssetType = "screenshot"
 	BookmarkAssetsAssetTypeUnknown           BookmarkAssetsAssetType = "unknown"
 	BookmarkAssetsAssetTypeUserUploaded      BookmarkAssetsAssetType = "userUploaded"
 	BookmarkAssetsAssetTypeVideo             BookmarkAssetsAssetType = "video"
+)
+
+// Defines values for BookmarkContent0CrawlStatus.
+const (
+	BookmarkContent0CrawlStatusFailure BookmarkContent0CrawlStatus = "failure"
+	BookmarkContent0CrawlStatusPending BookmarkContent0CrawlStatus = "pending"
+	BookmarkContent0CrawlStatusSuccess BookmarkContent0CrawlStatus = "success"
 )
 
 // Defines values for BookmarkContent0Type.
@@ -74,9 +83,9 @@ const (
 
 // Defines values for BookmarkTaggingStatus.
 const (
-	BookmarkTaggingStatusFailure BookmarkTaggingStatus = "failure"
-	BookmarkTaggingStatusPending BookmarkTaggingStatus = "pending"
-	BookmarkTaggingStatusSuccess BookmarkTaggingStatus = "success"
+	Failure BookmarkTaggingStatus = "failure"
+	Pending BookmarkTaggingStatus = "pending"
+	Success BookmarkTaggingStatus = "success"
 )
 
 // Defines values for BookmarkTagsAttachedBy.
@@ -149,8 +158,8 @@ const (
 
 // Defines values for PostBookmarksJSONBody2AssetType.
 const (
-	PostBookmarksJSONBody2AssetTypeImage PostBookmarksJSONBody2AssetType = "image"
-	PostBookmarksJSONBody2AssetTypePdf   PostBookmarksJSONBody2AssetType = "pdf"
+	Image PostBookmarksJSONBody2AssetType = "image"
+	Pdf   PostBookmarksJSONBody2AssetType = "pdf"
 )
 
 // Defines values for PostBookmarksJSONBody2Type.
@@ -167,16 +176,18 @@ const (
 
 // Defines values for PostBookmarksBookmarkIdAssetsJSONBodyAssetType.
 const (
-	AssetScreenshot   PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "assetScreenshot"
-	BannerImage       PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "bannerImage"
-	BookmarkAsset     PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "bookmarkAsset"
-	FullPageArchive   PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "fullPageArchive"
-	LinkHtmlContent   PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "linkHtmlContent"
-	PrecrawledArchive PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "precrawledArchive"
-	Screenshot        PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "screenshot"
-	Unknown           PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "unknown"
-	UserUploaded      PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "userUploaded"
-	Video             PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "video"
+	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeAssetScreenshot   PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "assetScreenshot"
+	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeAvatar            PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "avatar"
+	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeBannerImage       PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "bannerImage"
+	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeBookmarkAsset     PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "bookmarkAsset"
+	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeFullPageArchive   PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "fullPageArchive"
+	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeLinkHtmlContent   PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "linkHtmlContent"
+	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypePdf               PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "pdf"
+	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypePrecrawledArchive PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "precrawledArchive"
+	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeScreenshot        PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "screenshot"
+	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeUnknown           PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "unknown"
+	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeUserUploaded      PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "userUploaded"
+	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeVideo             PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "video"
 )
 
 // Defines values for PostHighlightsJSONBodyColor.
@@ -273,25 +284,30 @@ type BookmarkAssetsAssetType string
 
 // BookmarkContent0 defines model for .
 type BookmarkContent0 struct {
-	Author                   *string              `json:"author"`
-	ContentAssetId           *string              `json:"contentAssetId"`
-	CrawledAt                *string              `json:"crawledAt"`
-	DateModified             *string              `json:"dateModified"`
-	DatePublished            *string              `json:"datePublished"`
-	Description              *string              `json:"description"`
-	Favicon                  *string              `json:"favicon"`
-	FullPageArchiveAssetId   *string              `json:"fullPageArchiveAssetId"`
-	HtmlContent              *string              `json:"htmlContent"`
-	ImageAssetId             *string              `json:"imageAssetId"`
-	ImageUrl                 *string              `json:"imageUrl"`
-	PrecrawledArchiveAssetId *string              `json:"precrawledArchiveAssetId"`
-	Publisher                *string              `json:"publisher"`
-	ScreenshotAssetId        *string              `json:"screenshotAssetId"`
-	Title                    *string              `json:"title"`
-	Type                     BookmarkContent0Type `json:"type"`
-	Url                      string               `json:"url"`
-	VideoAssetId             *string              `json:"videoAssetId"`
+	Author                   *string                      `json:"author"`
+	ContentAssetId           *string                      `json:"contentAssetId"`
+	CrawlStatus              *BookmarkContent0CrawlStatus `json:"crawlStatus"`
+	CrawledAt                *string                      `json:"crawledAt"`
+	DateModified             *string                      `json:"dateModified"`
+	DatePublished            *string                      `json:"datePublished"`
+	Description              *string                      `json:"description"`
+	Favicon                  *string                      `json:"favicon"`
+	FullPageArchiveAssetId   *string                      `json:"fullPageArchiveAssetId"`
+	HtmlContent              *string                      `json:"htmlContent"`
+	ImageAssetId             *string                      `json:"imageAssetId"`
+	ImageUrl                 *string                      `json:"imageUrl"`
+	PdfAssetId               *string                      `json:"pdfAssetId"`
+	PrecrawledArchiveAssetId *string                      `json:"precrawledArchiveAssetId"`
+	Publisher                *string                      `json:"publisher"`
+	ScreenshotAssetId        *string                      `json:"screenshotAssetId"`
+	Title                    *string                      `json:"title"`
+	Type                     BookmarkContent0Type         `json:"type"`
+	Url                      string                       `json:"url"`
+	VideoAssetId             *string                      `json:"videoAssetId"`
 }
+
+// BookmarkContent0CrawlStatus defines model for Bookmark.Content.0.CrawlStatus.
+type BookmarkContent0CrawlStatus string
 
 // BookmarkContent0Type defines model for Bookmark.Content.0.Type.
 type BookmarkContent0Type string
