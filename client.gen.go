@@ -123,6 +123,9 @@ type ClientInterface interface {
 
 	PostBookmarks(ctx context.Context, body PostBookmarksJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// GetBookmarksCheckUrl request
+	GetBookmarksCheckUrl(ctx context.Context, params *GetBookmarksCheckUrlParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetBookmarksSearch request
 	GetBookmarksSearch(ctx context.Context, params *GetBookmarksSearchParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -379,6 +382,18 @@ func (c *Client) PostBookmarksWithBody(ctx context.Context, contentType string, 
 
 func (c *Client) PostBookmarks(ctx context.Context, body PostBookmarksJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostBookmarksRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetBookmarksCheckUrl(ctx context.Context, params *GetBookmarksCheckUrlParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetBookmarksCheckUrlRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1348,6 +1363,51 @@ func NewPostBookmarksRequestWithBody(server string, contentType string, body io.
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetBookmarksCheckUrlRequest generates requests for GetBookmarksCheckUrl
+func NewGetBookmarksCheckUrlRequest(server string, params *GetBookmarksCheckUrlParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/bookmarks/check-url")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "url", runtime.ParamLocationQuery, params.Url); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -3027,6 +3087,9 @@ type ClientWithResponsesInterface interface {
 
 	PostBookmarksWithResponse(ctx context.Context, body PostBookmarksJSONRequestBody, reqEditors ...RequestEditorFn) (*PostBookmarksResponse, error)
 
+	// GetBookmarksCheckUrlWithResponse request
+	GetBookmarksCheckUrlWithResponse(ctx context.Context, params *GetBookmarksCheckUrlParams, reqEditors ...RequestEditorFn) (*GetBookmarksCheckUrlResponse, error)
+
 	// GetBookmarksSearchWithResponse request
 	GetBookmarksSearchWithResponse(ctx context.Context, params *GetBookmarksSearchParams, reqEditors ...RequestEditorFn) (*GetBookmarksSearchResponse, error)
 
@@ -3423,6 +3486,30 @@ func (r PostBookmarksResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r PostBookmarksResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetBookmarksCheckUrlResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		BookmarkId *string `json:"bookmarkId"`
+	}
+}
+
+// Status returns HTTPResponse.Status
+func (r GetBookmarksCheckUrlResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetBookmarksCheckUrlResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -4472,6 +4559,15 @@ func (c *ClientWithResponses) PostBookmarksWithResponse(ctx context.Context, bod
 	return ParsePostBookmarksResponse(rsp)
 }
 
+// GetBookmarksCheckUrlWithResponse request returning *GetBookmarksCheckUrlResponse
+func (c *ClientWithResponses) GetBookmarksCheckUrlWithResponse(ctx context.Context, params *GetBookmarksCheckUrlParams, reqEditors ...RequestEditorFn) (*GetBookmarksCheckUrlResponse, error) {
+	rsp, err := c.GetBookmarksCheckUrl(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetBookmarksCheckUrlResponse(rsp)
+}
+
 // GetBookmarksSearchWithResponse request returning *GetBookmarksSearchResponse
 func (c *ClientWithResponses) GetBookmarksSearchWithResponse(ctx context.Context, params *GetBookmarksSearchParams, reqEditors ...RequestEditorFn) (*GetBookmarksSearchResponse, error) {
 	rsp, err := c.GetBookmarksSearch(ctx, params, reqEditors...)
@@ -5201,6 +5297,34 @@ func ParsePostBookmarksResponse(rsp *http.Response) (*PostBookmarksResponse, err
 			return nil, err
 		}
 		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetBookmarksCheckUrlResponse parses an HTTP response from a GetBookmarksCheckUrlWithResponse call
+func ParseGetBookmarksCheckUrlResponse(rsp *http.Response) (*GetBookmarksCheckUrlResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetBookmarksCheckUrlResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			BookmarkId *string `json:"bookmarkId"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
 
 	}
 

@@ -190,6 +190,18 @@ const (
 	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeVideo             PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "video"
 )
 
+// Defines values for DeleteBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy.
+const (
+	DeleteBookmarksBookmarkIdTagsJSONBodyTagsAttachedByAi    DeleteBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy = "ai"
+	DeleteBookmarksBookmarkIdTagsJSONBodyTagsAttachedByHuman DeleteBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy = "human"
+)
+
+// Defines values for PostBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy.
+const (
+	PostBookmarksBookmarkIdTagsJSONBodyTagsAttachedByAi    PostBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy = "ai"
+	PostBookmarksBookmarkIdTagsJSONBodyTagsAttachedByHuman PostBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy = "human"
+)
+
 // Defines values for PostHighlightsJSONBodyColor.
 const (
 	PostHighlightsJSONBodyColorBlue   PostHighlightsJSONBodyColor = "blue"
@@ -527,6 +539,11 @@ type PostBookmarksJSONBody2AssetType string
 // PostBookmarksJSONBody2Type defines parameters for PostBookmarks.
 type PostBookmarksJSONBody2Type string
 
+// GetBookmarksCheckUrlParams defines parameters for GetBookmarksCheckUrl.
+type GetBookmarksCheckUrlParams struct {
+	Url string `form:"url" json:"url"`
+}
+
 // GetBookmarksSearchParams defines parameters for GetBookmarksSearch.
 type GetBookmarksSearchParams struct {
 	Q         string                             `form:"q" json:"q"`
@@ -582,18 +599,26 @@ type PutBookmarksBookmarkIdAssetsAssetIdJSONBody struct {
 // DeleteBookmarksBookmarkIdTagsJSONBody defines parameters for DeleteBookmarksBookmarkIdTags.
 type DeleteBookmarksBookmarkIdTagsJSONBody struct {
 	Tags []struct {
-		TagId   *string `json:"tagId,omitempty"`
-		TagName *string `json:"tagName,omitempty"`
+		AttachedBy *DeleteBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy `json:"attachedBy,omitempty"`
+		TagId      *string                                              `json:"tagId,omitempty"`
+		TagName    *string                                              `json:"tagName,omitempty"`
 	} `json:"tags"`
 }
+
+// DeleteBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy defines parameters for DeleteBookmarksBookmarkIdTags.
+type DeleteBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy string
 
 // PostBookmarksBookmarkIdTagsJSONBody defines parameters for PostBookmarksBookmarkIdTags.
 type PostBookmarksBookmarkIdTagsJSONBody struct {
 	Tags []struct {
-		TagId   *string `json:"tagId,omitempty"`
-		TagName *string `json:"tagName,omitempty"`
+		AttachedBy *PostBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy `json:"attachedBy,omitempty"`
+		TagId      *string                                            `json:"tagId,omitempty"`
+		TagName    *string                                            `json:"tagName,omitempty"`
 	} `json:"tags"`
 }
+
+// PostBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy defines parameters for PostBookmarksBookmarkIdTags.
+type PostBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy string
 
 // GetHighlightsParams defines parameters for GetHighlights.
 type GetHighlightsParams struct {
