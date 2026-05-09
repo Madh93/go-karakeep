@@ -5,8 +5,10 @@ package karakeep
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/oapi-codegen/runtime"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 const (
@@ -31,9 +33,10 @@ const (
 
 // Defines values for BookmarkContent0CrawlStatus.
 const (
-	BookmarkContent0CrawlStatusFailure BookmarkContent0CrawlStatus = "failure"
-	BookmarkContent0CrawlStatusPending BookmarkContent0CrawlStatus = "pending"
-	BookmarkContent0CrawlStatusSuccess BookmarkContent0CrawlStatus = "success"
+	BookmarkContent0CrawlStatusFailure     BookmarkContent0CrawlStatus = "failure"
+	BookmarkContent0CrawlStatusLessThannil BookmarkContent0CrawlStatus = "<nil>"
+	BookmarkContent0CrawlStatusPending     BookmarkContent0CrawlStatus = "pending"
+	BookmarkContent0CrawlStatusSuccess     BookmarkContent0CrawlStatus = "success"
 )
 
 // Defines values for BookmarkContent0Type.
@@ -64,34 +67,45 @@ const (
 
 // Defines values for BookmarkSource.
 const (
-	BookmarkSourceApi        BookmarkSource = "api"
-	BookmarkSourceCli        BookmarkSource = "cli"
-	BookmarkSourceExtension  BookmarkSource = "extension"
-	BookmarkSourceImport     BookmarkSource = "import"
-	BookmarkSourceMobile     BookmarkSource = "mobile"
-	BookmarkSourceRss        BookmarkSource = "rss"
-	BookmarkSourceSinglefile BookmarkSource = "singlefile"
-	BookmarkSourceWeb        BookmarkSource = "web"
+	BookmarkSourceApi         BookmarkSource = "api"
+	BookmarkSourceCli         BookmarkSource = "cli"
+	BookmarkSourceExtension   BookmarkSource = "extension"
+	BookmarkSourceImport      BookmarkSource = "import"
+	BookmarkSourceLessThannil BookmarkSource = "<nil>"
+	BookmarkSourceMobile      BookmarkSource = "mobile"
+	BookmarkSourceRss         BookmarkSource = "rss"
+	BookmarkSourceSinglefile  BookmarkSource = "singlefile"
+	BookmarkSourceWeb         BookmarkSource = "web"
 )
 
 // Defines values for BookmarkSummarizationStatus.
 const (
-	BookmarkSummarizationStatusFailure BookmarkSummarizationStatus = "failure"
-	BookmarkSummarizationStatusPending BookmarkSummarizationStatus = "pending"
-	BookmarkSummarizationStatusSuccess BookmarkSummarizationStatus = "success"
+	BookmarkSummarizationStatusFailure     BookmarkSummarizationStatus = "failure"
+	BookmarkSummarizationStatusLessThannil BookmarkSummarizationStatus = "<nil>"
+	BookmarkSummarizationStatusPending     BookmarkSummarizationStatus = "pending"
+	BookmarkSummarizationStatusSuccess     BookmarkSummarizationStatus = "success"
 )
 
 // Defines values for BookmarkTaggingStatus.
 const (
-	Failure BookmarkTaggingStatus = "failure"
-	Pending BookmarkTaggingStatus = "pending"
-	Success BookmarkTaggingStatus = "success"
+	BookmarkTaggingStatusFailure     BookmarkTaggingStatus = "failure"
+	BookmarkTaggingStatusLessThannil BookmarkTaggingStatus = "<nil>"
+	BookmarkTaggingStatusPending     BookmarkTaggingStatus = "pending"
+	BookmarkTaggingStatusSuccess     BookmarkTaggingStatus = "success"
 )
 
 // Defines values for BookmarkTagsAttachedBy.
 const (
 	BookmarkTagsAttachedByAi    BookmarkTagsAttachedBy = "ai"
 	BookmarkTagsAttachedByHuman BookmarkTagsAttachedBy = "human"
+)
+
+// Defines values for FeedLastFetchedStatus.
+const (
+	FeedLastFetchedStatusFailure     FeedLastFetchedStatus = "failure"
+	FeedLastFetchedStatusLessThannil FeedLastFetchedStatus = "<nil>"
+	FeedLastFetchedStatusPending     FeedLastFetchedStatus = "pending"
+	FeedLastFetchedStatusSuccess     FeedLastFetchedStatus = "success"
 )
 
 // Defines values for HighlightColor.
@@ -116,152 +130,166 @@ const (
 	Viewer ListUserRole = "viewer"
 )
 
-// Defines values for PutAdminUsersUserIdJSONBodyRole.
+// Defines values for AdminTriggerInferenceJSONBodyStatus.
 const (
-	Admin PutAdminUsersUserIdJSONBodyRole = "admin"
-	User  PutAdminUsersUserIdJSONBodyRole = "user"
+	AdminTriggerInferenceJSONBodyStatusAll     AdminTriggerInferenceJSONBodyStatus = "all"
+	AdminTriggerInferenceJSONBodyStatusFailure AdminTriggerInferenceJSONBodyStatus = "failure"
+	AdminTriggerInferenceJSONBodyStatusPending AdminTriggerInferenceJSONBodyStatus = "pending"
+	AdminTriggerInferenceJSONBodyStatusSuccess AdminTriggerInferenceJSONBodyStatus = "success"
 )
 
-// Defines values for GetBookmarksParamsSortOrder.
+// Defines values for AdminTriggerInferenceJSONBodyType.
 const (
-	GetBookmarksParamsSortOrderAsc  GetBookmarksParamsSortOrder = "asc"
-	GetBookmarksParamsSortOrderDesc GetBookmarksParamsSortOrder = "desc"
+	AdminTriggerInferenceJSONBodyTypeSummarize AdminTriggerInferenceJSONBodyType = "summarize"
+	AdminTriggerInferenceJSONBodyTypeTag       AdminTriggerInferenceJSONBodyType = "tag"
 )
 
-// Defines values for PostBookmarksJSONBodyCrawlPriority.
+// Defines values for AdminTriggerRecrawlJSONBodyCrawlStatus.
 const (
-	Low    PostBookmarksJSONBodyCrawlPriority = "low"
-	Normal PostBookmarksJSONBodyCrawlPriority = "normal"
+	All     AdminTriggerRecrawlJSONBodyCrawlStatus = "all"
+	Failure AdminTriggerRecrawlJSONBodyCrawlStatus = "failure"
+	Pending AdminTriggerRecrawlJSONBodyCrawlStatus = "pending"
+	Success AdminTriggerRecrawlJSONBodyCrawlStatus = "success"
 )
 
-// Defines values for PostBookmarksJSONBodySource.
+// Defines values for AdminUpdateUserJSONBodyRole.
 const (
-	PostBookmarksJSONBodySourceApi        PostBookmarksJSONBodySource = "api"
-	PostBookmarksJSONBodySourceCli        PostBookmarksJSONBodySource = "cli"
-	PostBookmarksJSONBodySourceExtension  PostBookmarksJSONBodySource = "extension"
-	PostBookmarksJSONBodySourceImport     PostBookmarksJSONBodySource = "import"
-	PostBookmarksJSONBodySourceMobile     PostBookmarksJSONBodySource = "mobile"
-	PostBookmarksJSONBodySourceRss        PostBookmarksJSONBodySource = "rss"
-	PostBookmarksJSONBodySourceSinglefile PostBookmarksJSONBodySource = "singlefile"
-	PostBookmarksJSONBodySourceWeb        PostBookmarksJSONBodySource = "web"
+	Admin AdminUpdateUserJSONBodyRole = "admin"
+	User  AdminUpdateUserJSONBodyRole = "user"
 )
 
-// Defines values for PostBookmarksJSONBody0Type.
+// Defines values for ListBookmarksParamsSortOrder.
 const (
-	PostBookmarksJSONBody0TypeLink PostBookmarksJSONBody0Type = "link"
+	ListBookmarksParamsSortOrderAsc  ListBookmarksParamsSortOrder = "asc"
+	ListBookmarksParamsSortOrderDesc ListBookmarksParamsSortOrder = "desc"
 )
 
-// Defines values for PostBookmarksJSONBody1Type.
+// Defines values for CreateBookmarkJSONBodyCrawlPriority.
 const (
-	PostBookmarksJSONBody1TypeText PostBookmarksJSONBody1Type = "text"
+	Low    CreateBookmarkJSONBodyCrawlPriority = "low"
+	Normal CreateBookmarkJSONBodyCrawlPriority = "normal"
 )
 
-// Defines values for PostBookmarksJSONBody2AssetType.
+// Defines values for CreateBookmarkJSONBodySource.
 const (
-	Image PostBookmarksJSONBody2AssetType = "image"
-	Pdf   PostBookmarksJSONBody2AssetType = "pdf"
+	Api        CreateBookmarkJSONBodySource = "api"
+	Cli        CreateBookmarkJSONBodySource = "cli"
+	Extension  CreateBookmarkJSONBodySource = "extension"
+	Import     CreateBookmarkJSONBodySource = "import"
+	Mobile     CreateBookmarkJSONBodySource = "mobile"
+	Rss        CreateBookmarkJSONBodySource = "rss"
+	Singlefile CreateBookmarkJSONBodySource = "singlefile"
+	Web        CreateBookmarkJSONBodySource = "web"
 )
 
-// Defines values for PostBookmarksJSONBody2Type.
+// Defines values for CreateBookmarkJSONBody0Type.
 const (
-	PostBookmarksJSONBody2TypeAsset PostBookmarksJSONBody2Type = "asset"
+	CreateBookmarkJSONBody0TypeLink CreateBookmarkJSONBody0Type = "link"
 )
 
-// Defines values for GetBookmarksSearchParamsSortOrder.
+// Defines values for CreateBookmarkJSONBody1Type.
 const (
-	GetBookmarksSearchParamsSortOrderAsc       GetBookmarksSearchParamsSortOrder = "asc"
-	GetBookmarksSearchParamsSortOrderDesc      GetBookmarksSearchParamsSortOrder = "desc"
-	GetBookmarksSearchParamsSortOrderRelevance GetBookmarksSearchParamsSortOrder = "relevance"
+	CreateBookmarkJSONBody1TypeText CreateBookmarkJSONBody1Type = "text"
 )
 
-// Defines values for PostBookmarksBookmarkIdAssetsJSONBodyAssetType.
+// Defines values for CreateBookmarkJSONBody2AssetType.
 const (
-	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeAssetScreenshot   PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "assetScreenshot"
-	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeAvatar            PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "avatar"
-	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeBannerImage       PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "bannerImage"
-	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeBookmarkAsset     PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "bookmarkAsset"
-	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeFullPageArchive   PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "fullPageArchive"
-	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeLinkHtmlContent   PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "linkHtmlContent"
-	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypePdf               PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "pdf"
-	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypePrecrawledArchive PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "precrawledArchive"
-	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeScreenshot        PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "screenshot"
-	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeUnknown           PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "unknown"
-	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeUserUploaded      PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "userUploaded"
-	PostBookmarksBookmarkIdAssetsJSONBodyAssetTypeVideo             PostBookmarksBookmarkIdAssetsJSONBodyAssetType = "video"
+	Image CreateBookmarkJSONBody2AssetType = "image"
+	Pdf   CreateBookmarkJSONBody2AssetType = "pdf"
 )
 
-// Defines values for DeleteBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy.
+// Defines values for CreateBookmarkJSONBody2Type.
 const (
-	DeleteBookmarksBookmarkIdTagsJSONBodyTagsAttachedByAi    DeleteBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy = "ai"
-	DeleteBookmarksBookmarkIdTagsJSONBodyTagsAttachedByHuman DeleteBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy = "human"
+	CreateBookmarkJSONBody2TypeAsset CreateBookmarkJSONBody2Type = "asset"
 )
 
-// Defines values for PostBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy.
+// Defines values for SearchBookmarksParamsSortOrder.
 const (
-	PostBookmarksBookmarkIdTagsJSONBodyTagsAttachedByAi    PostBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy = "ai"
-	PostBookmarksBookmarkIdTagsJSONBodyTagsAttachedByHuman PostBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy = "human"
+	SearchBookmarksParamsSortOrderAsc       SearchBookmarksParamsSortOrder = "asc"
+	SearchBookmarksParamsSortOrderDesc      SearchBookmarksParamsSortOrder = "desc"
+	SearchBookmarksParamsSortOrderRelevance SearchBookmarksParamsSortOrder = "relevance"
 )
 
-// Defines values for PostHighlightsJSONBodyColor.
+// Defines values for AttachAssetToBookmarkJSONBodyAssetType.
 const (
-	PostHighlightsJSONBodyColorBlue   PostHighlightsJSONBodyColor = "blue"
-	PostHighlightsJSONBodyColorGreen  PostHighlightsJSONBodyColor = "green"
-	PostHighlightsJSONBodyColorRed    PostHighlightsJSONBodyColor = "red"
-	PostHighlightsJSONBodyColorYellow PostHighlightsJSONBodyColor = "yellow"
+	AttachAssetToBookmarkJSONBodyAssetTypeAssetScreenshot   AttachAssetToBookmarkJSONBodyAssetType = "assetScreenshot"
+	AttachAssetToBookmarkJSONBodyAssetTypeAvatar            AttachAssetToBookmarkJSONBodyAssetType = "avatar"
+	AttachAssetToBookmarkJSONBodyAssetTypeBannerImage       AttachAssetToBookmarkJSONBodyAssetType = "bannerImage"
+	AttachAssetToBookmarkJSONBodyAssetTypeBookmarkAsset     AttachAssetToBookmarkJSONBodyAssetType = "bookmarkAsset"
+	AttachAssetToBookmarkJSONBodyAssetTypeFullPageArchive   AttachAssetToBookmarkJSONBodyAssetType = "fullPageArchive"
+	AttachAssetToBookmarkJSONBodyAssetTypeLinkHtmlContent   AttachAssetToBookmarkJSONBodyAssetType = "linkHtmlContent"
+	AttachAssetToBookmarkJSONBodyAssetTypePdf               AttachAssetToBookmarkJSONBodyAssetType = "pdf"
+	AttachAssetToBookmarkJSONBodyAssetTypePrecrawledArchive AttachAssetToBookmarkJSONBodyAssetType = "precrawledArchive"
+	AttachAssetToBookmarkJSONBodyAssetTypeScreenshot        AttachAssetToBookmarkJSONBodyAssetType = "screenshot"
+	AttachAssetToBookmarkJSONBodyAssetTypeUnknown           AttachAssetToBookmarkJSONBodyAssetType = "unknown"
+	AttachAssetToBookmarkJSONBodyAssetTypeUserUploaded      AttachAssetToBookmarkJSONBodyAssetType = "userUploaded"
+	AttachAssetToBookmarkJSONBodyAssetTypeVideo             AttachAssetToBookmarkJSONBodyAssetType = "video"
 )
 
-// Defines values for PatchHighlightsHighlightIdJSONBodyColor.
+// Defines values for DetachTagsFromBookmarkJSONBodyTagsAttachedBy.
 const (
-	Blue   PatchHighlightsHighlightIdJSONBodyColor = "blue"
-	Green  PatchHighlightsHighlightIdJSONBodyColor = "green"
-	Red    PatchHighlightsHighlightIdJSONBodyColor = "red"
-	Yellow PatchHighlightsHighlightIdJSONBodyColor = "yellow"
+	DetachTagsFromBookmarkJSONBodyTagsAttachedByAi    DetachTagsFromBookmarkJSONBodyTagsAttachedBy = "ai"
+	DetachTagsFromBookmarkJSONBodyTagsAttachedByHuman DetachTagsFromBookmarkJSONBodyTagsAttachedBy = "human"
 )
 
-// Defines values for PostListsJSONBodyType.
+// Defines values for AttachTagsToBookmarkJSONBodyTagsAttachedBy.
 const (
-	PostListsJSONBodyTypeManual PostListsJSONBodyType = "manual"
-	PostListsJSONBodyTypeSmart  PostListsJSONBodyType = "smart"
+	AttachTagsToBookmarkJSONBodyTagsAttachedByAi    AttachTagsToBookmarkJSONBodyTagsAttachedBy = "ai"
+	AttachTagsToBookmarkJSONBodyTagsAttachedByHuman AttachTagsToBookmarkJSONBodyTagsAttachedBy = "human"
 )
 
-// Defines values for GetListsListIdBookmarksParamsSortOrder.
+// Defines values for CreateHighlightJSONBodyColor.
 const (
-	GetListsListIdBookmarksParamsSortOrderAsc  GetListsListIdBookmarksParamsSortOrder = "asc"
-	GetListsListIdBookmarksParamsSortOrderDesc GetListsListIdBookmarksParamsSortOrder = "desc"
+	CreateHighlightJSONBodyColorBlue   CreateHighlightJSONBodyColor = "blue"
+	CreateHighlightJSONBodyColorGreen  CreateHighlightJSONBodyColor = "green"
+	CreateHighlightJSONBodyColorRed    CreateHighlightJSONBodyColor = "red"
+	CreateHighlightJSONBodyColorYellow CreateHighlightJSONBodyColor = "yellow"
 )
 
-// Defines values for GetTagsParamsSort.
+// Defines values for UpdateHighlightJSONBodyColor.
 const (
-	Name      GetTagsParamsSort = "name"
-	Relevance GetTagsParamsSort = "relevance"
-	Usage     GetTagsParamsSort = "usage"
+	Blue   UpdateHighlightJSONBodyColor = "blue"
+	Green  UpdateHighlightJSONBodyColor = "green"
+	Red    UpdateHighlightJSONBodyColor = "red"
+	Yellow UpdateHighlightJSONBodyColor = "yellow"
 )
 
-// Defines values for GetTagsParamsAttachedBy.
+// Defines values for CreateListJSONBodyType.
 const (
-	GetTagsParamsAttachedByAi    GetTagsParamsAttachedBy = "ai"
-	GetTagsParamsAttachedByHuman GetTagsParamsAttachedBy = "human"
-	GetTagsParamsAttachedByNone  GetTagsParamsAttachedBy = "none"
+	CreateListJSONBodyTypeManual CreateListJSONBodyType = "manual"
+	CreateListJSONBodyTypeSmart  CreateListJSONBodyType = "smart"
 )
 
-// Defines values for GetTagsTagIdBookmarksParamsSortOrder.
+// Defines values for GetListBookmarksParamsSortOrder.
 const (
-	GetTagsTagIdBookmarksParamsSortOrderAsc  GetTagsTagIdBookmarksParamsSortOrder = "asc"
-	GetTagsTagIdBookmarksParamsSortOrderDesc GetTagsTagIdBookmarksParamsSortOrder = "desc"
+	GetListBookmarksParamsSortOrderAsc  GetListBookmarksParamsSortOrder = "asc"
+	GetListBookmarksParamsSortOrderDesc GetListBookmarksParamsSortOrder = "desc"
 )
 
-// Asset defines model for Asset.
-type Asset struct {
-	AssetId     string  `json:"assetId"`
-	ContentType string  `json:"contentType"`
-	FileName    string  `json:"fileName"`
-	Size        float32 `json:"size"`
-}
+// Defines values for ListTagsParamsSort.
+const (
+	Name      ListTagsParamsSort = "name"
+	Relevance ListTagsParamsSort = "relevance"
+	Usage     ListTagsParamsSort = "usage"
+)
 
-// AssetId defines model for AssetId.
+// Defines values for ListTagsParamsAttachedBy.
+const (
+	ListTagsParamsAttachedByAi    ListTagsParamsAttachedBy = "ai"
+	ListTagsParamsAttachedByHuman ListTagsParamsAttachedBy = "human"
+	ListTagsParamsAttachedByNone  ListTagsParamsAttachedBy = "none"
+)
+
+// Defines values for GetTagBookmarksParamsSortOrder.
+const (
+	GetTagBookmarksParamsSortOrderAsc  GetTagBookmarksParamsSortOrder = "asc"
+	GetTagBookmarksParamsSortOrderDesc GetTagBookmarksParamsSortOrder = "desc"
+)
+
+// AssetId The unique identifier of the asset.
 type AssetId = string
 
-// BackupId defines model for BackupId.
+// BackupId The unique identifier of the backup.
 type BackupId = string
 
 // Bookmark defines model for Bookmark.
@@ -273,10 +301,10 @@ type Bookmark struct {
 		Id        string                  `json:"id"`
 	} `json:"assets"`
 	Content             Bookmark_Content             `json:"content"`
-	CreatedAt           string                       `json:"createdAt"`
+	CreatedAt           time.Time                    `json:"createdAt"`
 	Favourited          bool                         `json:"favourited"`
 	Id                  string                       `json:"id"`
-	ModifiedAt          *string                      `json:"modifiedAt"`
+	ModifiedAt          *time.Time                   `json:"modifiedAt"`
 	Note                *string                      `json:"note"`
 	Source              *BookmarkSource              `json:"source"`
 	SummarizationStatus *BookmarkSummarizationStatus `json:"summarizationStatus"`
@@ -299,9 +327,9 @@ type BookmarkContent0 struct {
 	Author                   *string                      `json:"author"`
 	ContentAssetId           *string                      `json:"contentAssetId"`
 	CrawlStatus              *BookmarkContent0CrawlStatus `json:"crawlStatus"`
-	CrawledAt                *string                      `json:"crawledAt"`
-	DateModified             *string                      `json:"dateModified"`
-	DatePublished            *string                      `json:"datePublished"`
+	CrawledAt                *time.Time                   `json:"crawledAt"`
+	DateModified             *time.Time                   `json:"dateModified"`
+	DatePublished            *time.Time                   `json:"datePublished"`
 	Description              *string                      `json:"description"`
 	Favicon                  *string                      `json:"favicon"`
 	FullPageArchiveAssetId   *string                      `json:"fullPageArchiveAssetId"`
@@ -376,20 +404,48 @@ type BookmarkTaggingStatus string
 // BookmarkTagsAttachedBy defines model for Bookmark.Tags.AttachedBy.
 type BookmarkTagsAttachedBy string
 
-// BookmarkId defines model for BookmarkId.
+// BookmarkId The unique identifier of the bookmark.
 type BookmarkId = string
 
-// Cursor defines model for Cursor.
+// Cursor Cursor from a previous response to fetch the next page.
 type Cursor = string
 
-// FileToBeUploaded defines model for File to be uploaded.
-type FileToBeUploaded = interface{}
+// Error defines model for Error.
+type Error struct {
+	// Code A machine-readable error code.
+	Code string `json:"code"`
+
+	// Message A human-readable error message.
+	Message string `json:"message"`
+}
+
+// Feed defines model for Feed.
+type Feed struct {
+	Enabled    bool   `json:"enabled"`
+	Id         string `json:"id"`
+	ImportTags bool   `json:"importTags"`
+
+	// LastFetchedAt ISO 8601 timestamp of the last fetch attempt, or null if never fetched.
+	LastFetchedAt     *string                `json:"lastFetchedAt"`
+	LastFetchedStatus *FeedLastFetchedStatus `json:"lastFetchedStatus"`
+
+	// LastSuccessfulFetchAt ISO 8601 timestamp of the last successful fetch, or null if the feed has never been fetched successfully.
+	LastSuccessfulFetchAt *string `json:"lastSuccessfulFetchAt"`
+	Name                  string  `json:"name"`
+	Url                   string  `json:"url"`
+}
+
+// FeedLastFetchedStatus defines model for Feed.LastFetchedStatus.
+type FeedLastFetchedStatus string
+
+// FeedId The unique identifier of the feed.
+type FeedId = string
 
 // Highlight defines model for Highlight.
 type Highlight struct {
 	BookmarkId  string          `json:"bookmarkId"`
 	Color       *HighlightColor `json:"color,omitempty"`
-	CreatedAt   string          `json:"createdAt"`
+	CreatedAt   time.Time       `json:"createdAt"`
 	EndOffset   float32         `json:"endOffset"`
 	Id          string          `json:"id"`
 	Note        *string         `json:"note"`
@@ -401,7 +457,7 @@ type Highlight struct {
 // HighlightColor defines model for Highlight.Color.
 type HighlightColor string
 
-// HighlightId defines model for HighlightId.
+// HighlightId The unique identifier of the highlight.
 type HighlightId = string
 
 // List defines model for List.
@@ -424,19 +480,23 @@ type ListType string
 // ListUserRole defines model for List.UserRole.
 type ListUserRole string
 
-// ListId defines model for ListId.
+// ListId The unique identifier of the list.
 type ListId = string
 
 // PaginatedBookmarks defines model for PaginatedBookmarks.
 type PaginatedBookmarks struct {
-	Bookmarks  []Bookmark `json:"bookmarks"`
-	NextCursor *string    `json:"nextCursor"`
+	Bookmarks []Bookmark `json:"bookmarks"`
+
+	// NextCursor Cursor for the next page, or null if no more results.
+	NextCursor *string `json:"nextCursor"`
 }
 
 // PaginatedHighlights defines model for PaginatedHighlights.
 type PaginatedHighlights struct {
 	Highlights []Highlight `json:"highlights"`
-	NextCursor *string     `json:"nextCursor"`
+
+	// NextCursor Cursor for the next page, or null if no more results.
+	NextCursor *string `json:"nextCursor"`
 }
 
 // Tag defines model for Tag.
@@ -450,219 +510,302 @@ type Tag struct {
 	} `json:"numBookmarksByAttachedType"`
 }
 
-// TagId defines model for TagId.
+// TagId The unique identifier of the tag.
 type TagId = string
 
-// PutAdminUsersUserIdJSONBody defines parameters for PutAdminUsersUserId.
-type PutAdminUsersUserIdJSONBody struct {
-	BookmarkQuota          *int                             `json:"bookmarkQuota"`
-	BrowserCrawlingEnabled *bool                            `json:"browserCrawlingEnabled"`
-	Role                   *PutAdminUsersUserIdJSONBodyRole `json:"role,omitempty"`
-	StorageQuota           *int                             `json:"storageQuota"`
+// UploadedAsset defines model for UploadedAsset.
+type UploadedAsset struct {
+	// AssetId The unique identifier assigned to the uploaded asset.
+	AssetId string `json:"assetId"`
+
+	// ContentType The MIME type of the uploaded file.
+	ContentType string `json:"contentType"`
+
+	// FileName The original file name of the uploaded file.
+	FileName string `json:"fileName"`
+
+	// Size The size of the uploaded file in bytes.
+	Size float32 `json:"size"`
 }
 
-// PutAdminUsersUserIdJSONBodyRole defines parameters for PutAdminUsersUserId.
-type PutAdminUsersUserIdJSONBodyRole string
+// AdminTriggerInferenceJSONBody defines parameters for AdminTriggerInference.
+type AdminTriggerInferenceJSONBody struct {
+	// Status Filter bookmarks by their inference status. Use 'failure' to retry only failed ones.
+	Status *AdminTriggerInferenceJSONBodyStatus `json:"status,omitempty"`
 
-// PostAssetsMultipartBody defines parameters for PostAssets.
-type PostAssetsMultipartBody struct {
-	File FileToBeUploaded `json:"file"`
+	// Type The type of inference to run: 'tag' for AI tagging, 'summarize' for AI summarization.
+	Type AdminTriggerInferenceJSONBodyType `json:"type"`
 }
 
-// GetBookmarksParams defines parameters for GetBookmarks.
-type GetBookmarksParams struct {
-	Archived   *bool                        `form:"archived,omitempty" json:"archived,omitempty"`
-	Favourited *bool                        `form:"favourited,omitempty" json:"favourited,omitempty"`
-	SortOrder  *GetBookmarksParamsSortOrder `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
-	Limit      *float32                     `form:"limit,omitempty" json:"limit,omitempty"`
-	Cursor     *Cursor                      `form:"cursor,omitempty" json:"cursor,omitempty"`
+// AdminTriggerInferenceJSONBodyStatus defines parameters for AdminTriggerInference.
+type AdminTriggerInferenceJSONBodyStatus string
 
-	// IncludeContent If set to true, bookmark's content will be included in the response. Note, this content can be large for some bookmarks.
+// AdminTriggerInferenceJSONBodyType defines parameters for AdminTriggerInference.
+type AdminTriggerInferenceJSONBodyType string
+
+// AdminTriggerRecrawlJSONBody defines parameters for AdminTriggerRecrawl.
+type AdminTriggerRecrawlJSONBody struct {
+	// CrawlStatus Filter bookmarks by their crawl status. Use 'failure' to retry only failed crawls.
+	CrawlStatus *AdminTriggerRecrawlJSONBodyCrawlStatus `json:"crawlStatus,omitempty"`
+
+	// RunInference Whether to run AI inference after crawling.
+	RunInference *bool `json:"runInference,omitempty"`
+}
+
+// AdminTriggerRecrawlJSONBodyCrawlStatus defines parameters for AdminTriggerRecrawl.
+type AdminTriggerRecrawlJSONBodyCrawlStatus string
+
+// AdminUpdateUserJSONBody defines parameters for AdminUpdateUser.
+type AdminUpdateUserJSONBody struct {
+	BookmarkQuota          *int                         `json:"bookmarkQuota"`
+	BrowserCrawlingEnabled *bool                        `json:"browserCrawlingEnabled"`
+	Role                   *AdminUpdateUserJSONBodyRole `json:"role,omitempty"`
+	StorageQuota           *int                         `json:"storageQuota"`
+}
+
+// AdminUpdateUserJSONBodyRole defines parameters for AdminUpdateUser.
+type AdminUpdateUserJSONBodyRole string
+
+// UploadAssetMultipartBody defines parameters for UploadAsset.
+type UploadAssetMultipartBody struct {
+	// File File to be uploaded
+	File openapi_types.File `json:"file"`
+}
+
+// ListBookmarksParams defines parameters for ListBookmarks.
+type ListBookmarksParams struct {
+	// Archived Filter by archived status.
+	Archived *bool `form:"archived,omitempty" json:"archived,omitempty"`
+
+	// Favourited Filter by favourited status.
+	Favourited *bool `form:"favourited,omitempty" json:"favourited,omitempty"`
+
+	// SortOrder Sort order by creation date. Defaults to 'desc'.
+	SortOrder *ListBookmarksParamsSortOrder `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
+
+	// Limit Maximum number of items to return per page.
+	Limit *float32 `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// Cursor Cursor from a previous response to fetch the next page.
+	Cursor *Cursor `form:"cursor,omitempty" json:"cursor,omitempty"`
+
+	// IncludeContent If set to true, the bookmark's full content (HTML, text, etc.) will be included in the response. Set to false for lighter responses when only metadata is needed.
 	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
 }
 
-// GetBookmarksParamsSortOrder defines parameters for GetBookmarks.
-type GetBookmarksParamsSortOrder string
+// ListBookmarksParamsSortOrder defines parameters for ListBookmarks.
+type ListBookmarksParamsSortOrder string
 
-// PostBookmarksJSONBody defines parameters for PostBookmarks.
-type PostBookmarksJSONBody struct {
-	Archived        *bool                               `json:"archived,omitempty"`
-	CrawlPriority   *PostBookmarksJSONBodyCrawlPriority `json:"crawlPriority,omitempty"`
-	CreatedAt       *string                             `json:"createdAt"`
-	Favourited      *bool                               `json:"favourited,omitempty"`
-	ImportSessionId *string                             `json:"importSessionId,omitempty"`
-	Note            *string                             `json:"note,omitempty"`
-	Source          *PostBookmarksJSONBodySource        `json:"source,omitempty"`
-	Summary         *string                             `json:"summary,omitempty"`
-	Title           *string                             `json:"title"`
+// CreateBookmarkJSONBody defines parameters for CreateBookmark.
+type CreateBookmarkJSONBody struct {
+	Archived        *bool                                `json:"archived,omitempty"`
+	CrawlPriority   *CreateBookmarkJSONBodyCrawlPriority `json:"crawlPriority,omitempty"`
+	CreatedAt       *time.Time                           `json:"createdAt,omitempty"`
+	Favourited      *bool                                `json:"favourited,omitempty"`
+	ImportSessionId *string                              `json:"importSessionId,omitempty"`
+	Note            *string                              `json:"note,omitempty"`
+	Source          *CreateBookmarkJSONBodySource        `json:"source,omitempty"`
+	Summary         *string                              `json:"summary,omitempty"`
+	Title           *string                              `json:"title"`
 	union           json.RawMessage
 }
 
-// PostBookmarksJSONBodyCrawlPriority defines parameters for PostBookmarks.
-type PostBookmarksJSONBodyCrawlPriority string
+// CreateBookmarkJSONBodyCrawlPriority defines parameters for CreateBookmark.
+type CreateBookmarkJSONBodyCrawlPriority string
 
-// PostBookmarksJSONBodySource defines parameters for PostBookmarks.
-type PostBookmarksJSONBodySource string
+// CreateBookmarkJSONBodySource defines parameters for CreateBookmark.
+type CreateBookmarkJSONBodySource string
 
-// PostBookmarksJSONBody0 defines parameters for PostBookmarks.
-type PostBookmarksJSONBody0 struct {
-	PrecrawledArchiveId *string                    `json:"precrawledArchiveId,omitempty"`
-	Type                PostBookmarksJSONBody0Type `json:"type"`
-	Url                 string                     `json:"url"`
+// CreateBookmarkJSONBody0 defines parameters for CreateBookmark.
+type CreateBookmarkJSONBody0 struct {
+	PrecrawledArchiveId *string                     `json:"precrawledArchiveId,omitempty"`
+	Type                CreateBookmarkJSONBody0Type `json:"type"`
+	Url                 string                      `json:"url"`
 }
 
-// PostBookmarksJSONBody0Type defines parameters for PostBookmarks.
-type PostBookmarksJSONBody0Type string
+// CreateBookmarkJSONBody0Type defines parameters for CreateBookmark.
+type CreateBookmarkJSONBody0Type string
 
-// PostBookmarksJSONBody1 defines parameters for PostBookmarks.
-type PostBookmarksJSONBody1 struct {
-	SourceUrl *string                    `json:"sourceUrl,omitempty"`
-	Text      string                     `json:"text"`
-	Type      PostBookmarksJSONBody1Type `json:"type"`
+// CreateBookmarkJSONBody1 defines parameters for CreateBookmark.
+type CreateBookmarkJSONBody1 struct {
+	SourceUrl *string                     `json:"sourceUrl,omitempty"`
+	Text      string                      `json:"text"`
+	Type      CreateBookmarkJSONBody1Type `json:"type"`
 }
 
-// PostBookmarksJSONBody1Type defines parameters for PostBookmarks.
-type PostBookmarksJSONBody1Type string
+// CreateBookmarkJSONBody1Type defines parameters for CreateBookmark.
+type CreateBookmarkJSONBody1Type string
 
-// PostBookmarksJSONBody2 defines parameters for PostBookmarks.
-type PostBookmarksJSONBody2 struct {
-	AssetId   string                          `json:"assetId"`
-	AssetType PostBookmarksJSONBody2AssetType `json:"assetType"`
-	FileName  *string                         `json:"fileName,omitempty"`
-	SourceUrl *string                         `json:"sourceUrl,omitempty"`
-	Type      PostBookmarksJSONBody2Type      `json:"type"`
+// CreateBookmarkJSONBody2 defines parameters for CreateBookmark.
+type CreateBookmarkJSONBody2 struct {
+	AssetId   string                           `json:"assetId"`
+	AssetType CreateBookmarkJSONBody2AssetType `json:"assetType"`
+	FileName  *string                          `json:"fileName,omitempty"`
+	SourceUrl *string                          `json:"sourceUrl,omitempty"`
+	Type      CreateBookmarkJSONBody2Type      `json:"type"`
 }
 
-// PostBookmarksJSONBody2AssetType defines parameters for PostBookmarks.
-type PostBookmarksJSONBody2AssetType string
+// CreateBookmarkJSONBody2AssetType defines parameters for CreateBookmark.
+type CreateBookmarkJSONBody2AssetType string
 
-// PostBookmarksJSONBody2Type defines parameters for PostBookmarks.
-type PostBookmarksJSONBody2Type string
+// CreateBookmarkJSONBody2Type defines parameters for CreateBookmark.
+type CreateBookmarkJSONBody2Type string
 
-// GetBookmarksCheckUrlParams defines parameters for GetBookmarksCheckUrl.
-type GetBookmarksCheckUrlParams struct {
+// CheckBookmarkUrlParams defines parameters for CheckBookmarkUrl.
+type CheckBookmarkUrlParams struct {
+	// Url The URL to check against existing bookmarks.
 	Url string `form:"url" json:"url"`
 }
 
-// GetBookmarksSearchParams defines parameters for GetBookmarksSearch.
-type GetBookmarksSearchParams struct {
-	Q         string                             `form:"q" json:"q"`
-	SortOrder *GetBookmarksSearchParamsSortOrder `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
-	Limit     *float32                           `form:"limit,omitempty" json:"limit,omitempty"`
-	Cursor    *Cursor                            `form:"cursor,omitempty" json:"cursor,omitempty"`
+// SearchBookmarksParams defines parameters for SearchBookmarks.
+type SearchBookmarksParams struct {
+	// Q The search query string.
+	Q string `form:"q" json:"q"`
 
-	// IncludeContent If set to true, bookmark's content will be included in the response. Note, this content can be large for some bookmarks.
+	// SortOrder Sort order for results. Defaults to 'relevance'. Use 'asc' or 'desc' for date-based sorting.
+	SortOrder *SearchBookmarksParamsSortOrder `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
+
+	// Limit Maximum number of items to return per page.
+	Limit *float32 `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// Cursor Cursor from a previous response to fetch the next page.
+	Cursor *Cursor `form:"cursor,omitempty" json:"cursor,omitempty"`
+
+	// IncludeContent If set to true, the bookmark's full content (HTML, text, etc.) will be included in the response. Set to false for lighter responses when only metadata is needed.
 	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
 }
 
-// GetBookmarksSearchParamsSortOrder defines parameters for GetBookmarksSearch.
-type GetBookmarksSearchParamsSortOrder string
+// SearchBookmarksParamsSortOrder defines parameters for SearchBookmarks.
+type SearchBookmarksParamsSortOrder string
 
-// GetBookmarksBookmarkIdParams defines parameters for GetBookmarksBookmarkId.
-type GetBookmarksBookmarkIdParams struct {
-	// IncludeContent If set to true, bookmark's content will be included in the response. Note, this content can be large for some bookmarks.
+// GetBookmarkParams defines parameters for GetBookmark.
+type GetBookmarkParams struct {
+	// IncludeContent If set to true, the bookmark's full content (HTML, text, etc.) will be included in the response. Set to false for lighter responses when only metadata is needed.
 	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
 }
 
-// PatchBookmarksBookmarkIdJSONBody defines parameters for PatchBookmarksBookmarkId.
-type PatchBookmarksBookmarkIdJSONBody struct {
-	Archived      *bool   `json:"archived,omitempty"`
-	AssetContent  *string `json:"assetContent"`
-	Author        *string `json:"author"`
-	CreatedAt     *string `json:"createdAt"`
-	DateModified  *string `json:"dateModified"`
-	DatePublished *string `json:"datePublished"`
-	Description   *string `json:"description"`
-	Favourited    *bool   `json:"favourited,omitempty"`
-	Note          *string `json:"note,omitempty"`
-	Publisher     *string `json:"publisher"`
-	Summary       *string `json:"summary"`
-	Text          *string `json:"text"`
-	Title         *string `json:"title"`
-	Url           *string `json:"url,omitempty"`
+// UpdateBookmarkJSONBody defines parameters for UpdateBookmark.
+type UpdateBookmarkJSONBody struct {
+	Archived      *bool      `json:"archived,omitempty"`
+	AssetContent  *string    `json:"assetContent"`
+	Author        *string    `json:"author"`
+	CreatedAt     *time.Time `json:"createdAt,omitempty"`
+	DateModified  *time.Time `json:"dateModified"`
+	DatePublished *time.Time `json:"datePublished"`
+	Description   *string    `json:"description"`
+	Favourited    *bool      `json:"favourited,omitempty"`
+	Note          *string    `json:"note,omitempty"`
+	Publisher     *string    `json:"publisher"`
+	Summary       *string    `json:"summary"`
+	Text          *string    `json:"text"`
+	Title         *string    `json:"title"`
+	Url           *string    `json:"url,omitempty"`
 }
 
-// PostBookmarksBookmarkIdAssetsJSONBody defines parameters for PostBookmarksBookmarkIdAssets.
-type PostBookmarksBookmarkIdAssetsJSONBody struct {
-	AssetType PostBookmarksBookmarkIdAssetsJSONBodyAssetType `json:"assetType"`
-	Id        string                                         `json:"id"`
+// AttachAssetToBookmarkJSONBody defines parameters for AttachAssetToBookmark.
+type AttachAssetToBookmarkJSONBody struct {
+	// AssetType The type classification for this asset.
+	AssetType AttachAssetToBookmarkJSONBodyAssetType `json:"assetType"`
+
+	// Id The ID of the previously uploaded asset.
+	Id string `json:"id"`
 }
 
-// PostBookmarksBookmarkIdAssetsJSONBodyAssetType defines parameters for PostBookmarksBookmarkIdAssets.
-type PostBookmarksBookmarkIdAssetsJSONBodyAssetType string
+// AttachAssetToBookmarkJSONBodyAssetType defines parameters for AttachAssetToBookmark.
+type AttachAssetToBookmarkJSONBodyAssetType string
 
-// PutBookmarksBookmarkIdAssetsAssetIdJSONBody defines parameters for PutBookmarksBookmarkIdAssetsAssetId.
-type PutBookmarksBookmarkIdAssetsAssetIdJSONBody struct {
+// ReplaceAssetOnBookmarkJSONBody defines parameters for ReplaceAssetOnBookmark.
+type ReplaceAssetOnBookmarkJSONBody struct {
+	// AssetId The ID of the new asset to use as a replacement.
 	AssetId string `json:"assetId"`
 }
 
-// DeleteBookmarksBookmarkIdTagsJSONBody defines parameters for DeleteBookmarksBookmarkIdTags.
-type DeleteBookmarksBookmarkIdTagsJSONBody struct {
+// DetachTagsFromBookmarkJSONBody defines parameters for DetachTagsFromBookmark.
+type DetachTagsFromBookmarkJSONBody struct {
 	Tags []struct {
-		AttachedBy *DeleteBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy `json:"attachedBy,omitempty"`
-		TagId      *string                                              `json:"tagId,omitempty"`
-		TagName    *string                                              `json:"tagName,omitempty"`
+		AttachedBy *DetachTagsFromBookmarkJSONBodyTagsAttachedBy `json:"attachedBy,omitempty"`
+		TagId      *string                                       `json:"tagId,omitempty"`
+		TagName    *string                                       `json:"tagName,omitempty"`
 	} `json:"tags"`
 }
 
-// DeleteBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy defines parameters for DeleteBookmarksBookmarkIdTags.
-type DeleteBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy string
+// DetachTagsFromBookmarkJSONBodyTagsAttachedBy defines parameters for DetachTagsFromBookmark.
+type DetachTagsFromBookmarkJSONBodyTagsAttachedBy string
 
-// PostBookmarksBookmarkIdTagsJSONBody defines parameters for PostBookmarksBookmarkIdTags.
-type PostBookmarksBookmarkIdTagsJSONBody struct {
+// AttachTagsToBookmarkJSONBody defines parameters for AttachTagsToBookmark.
+type AttachTagsToBookmarkJSONBody struct {
 	Tags []struct {
-		AttachedBy *PostBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy `json:"attachedBy,omitempty"`
-		TagId      *string                                            `json:"tagId,omitempty"`
-		TagName    *string                                            `json:"tagName,omitempty"`
+		AttachedBy *AttachTagsToBookmarkJSONBodyTagsAttachedBy `json:"attachedBy,omitempty"`
+		TagId      *string                                     `json:"tagId,omitempty"`
+		TagName    *string                                     `json:"tagName,omitempty"`
 	} `json:"tags"`
 }
 
-// PostBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy defines parameters for PostBookmarksBookmarkIdTags.
-type PostBookmarksBookmarkIdTagsJSONBodyTagsAttachedBy string
+// AttachTagsToBookmarkJSONBodyTagsAttachedBy defines parameters for AttachTagsToBookmark.
+type AttachTagsToBookmarkJSONBodyTagsAttachedBy string
 
-// GetHighlightsParams defines parameters for GetHighlights.
-type GetHighlightsParams struct {
-	Limit  *float32 `form:"limit,omitempty" json:"limit,omitempty"`
-	Cursor *Cursor  `form:"cursor,omitempty" json:"cursor,omitempty"`
+// CreateFeedJSONBody defines parameters for CreateFeed.
+type CreateFeedJSONBody struct {
+	Enabled    bool   `json:"enabled"`
+	ImportTags *bool  `json:"importTags,omitempty"`
+	Name       string `json:"name"`
+	Url        string `json:"url"`
 }
 
-// PostHighlightsJSONBody defines parameters for PostHighlights.
-type PostHighlightsJSONBody struct {
-	BookmarkId  string                       `json:"bookmarkId"`
-	Color       *PostHighlightsJSONBodyColor `json:"color,omitempty"`
-	EndOffset   float32                      `json:"endOffset"`
-	Note        *string                      `json:"note"`
-	StartOffset float32                      `json:"startOffset"`
-	Text        *string                      `json:"text"`
+// UpdateFeedJSONBody defines parameters for UpdateFeed.
+type UpdateFeedJSONBody struct {
+	Enabled    *bool   `json:"enabled,omitempty"`
+	ImportTags *bool   `json:"importTags,omitempty"`
+	Name       *string `json:"name,omitempty"`
+	Url        *string `json:"url,omitempty"`
 }
 
-// PostHighlightsJSONBodyColor defines parameters for PostHighlights.
-type PostHighlightsJSONBodyColor string
+// ListHighlightsParams defines parameters for ListHighlights.
+type ListHighlightsParams struct {
+	// Limit Maximum number of items to return per page.
+	Limit *float32 `form:"limit,omitempty" json:"limit,omitempty"`
 
-// PatchHighlightsHighlightIdJSONBody defines parameters for PatchHighlightsHighlightId.
-type PatchHighlightsHighlightIdJSONBody struct {
-	Color *PatchHighlightsHighlightIdJSONBodyColor `json:"color,omitempty"`
-	Note  *string                                  `json:"note"`
+	// Cursor Cursor from a previous response to fetch the next page.
+	Cursor *Cursor `form:"cursor,omitempty" json:"cursor,omitempty"`
 }
 
-// PatchHighlightsHighlightIdJSONBodyColor defines parameters for PatchHighlightsHighlightId.
-type PatchHighlightsHighlightIdJSONBodyColor string
-
-// PostListsJSONBody defines parameters for PostLists.
-type PostListsJSONBody struct {
-	Description *string                `json:"description,omitempty"`
-	Icon        string                 `json:"icon"`
-	Name        string                 `json:"name"`
-	ParentId    *string                `json:"parentId"`
-	Query       *string                `json:"query,omitempty"`
-	Type        *PostListsJSONBodyType `json:"type,omitempty"`
+// CreateHighlightJSONBody defines parameters for CreateHighlight.
+type CreateHighlightJSONBody struct {
+	BookmarkId  string                        `json:"bookmarkId"`
+	Color       *CreateHighlightJSONBodyColor `json:"color,omitempty"`
+	EndOffset   float32                       `json:"endOffset"`
+	Note        *string                       `json:"note"`
+	StartOffset float32                       `json:"startOffset"`
+	Text        *string                       `json:"text"`
 }
 
-// PostListsJSONBodyType defines parameters for PostLists.
-type PostListsJSONBodyType string
+// CreateHighlightJSONBodyColor defines parameters for CreateHighlight.
+type CreateHighlightJSONBodyColor string
 
-// PatchListsListIdJSONBody defines parameters for PatchListsListId.
-type PatchListsListIdJSONBody struct {
+// UpdateHighlightJSONBody defines parameters for UpdateHighlight.
+type UpdateHighlightJSONBody struct {
+	Color *UpdateHighlightJSONBodyColor `json:"color,omitempty"`
+	Note  *string                       `json:"note"`
+}
+
+// UpdateHighlightJSONBodyColor defines parameters for UpdateHighlight.
+type UpdateHighlightJSONBodyColor string
+
+// CreateListJSONBody defines parameters for CreateList.
+type CreateListJSONBody struct {
+	Description *string                 `json:"description,omitempty"`
+	Icon        string                  `json:"icon"`
+	Name        string                  `json:"name"`
+	ParentId    *string                 `json:"parentId"`
+	Query       *string                 `json:"query,omitempty"`
+	Type        *CreateListJSONBodyType `json:"type,omitempty"`
+}
+
+// CreateListJSONBodyType defines parameters for CreateList.
+type CreateListJSONBodyType string
+
+// UpdateListJSONBody defines parameters for UpdateList.
+type UpdateListJSONBody struct {
 	Description *string `json:"description"`
 	Icon        *string `json:"icon,omitempty"`
 	Name        *string `json:"name,omitempty"`
@@ -671,98 +814,120 @@ type PatchListsListIdJSONBody struct {
 	Query       *string `json:"query,omitempty"`
 }
 
-// GetListsListIdBookmarksParams defines parameters for GetListsListIdBookmarks.
-type GetListsListIdBookmarksParams struct {
-	SortOrder *GetListsListIdBookmarksParamsSortOrder `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
-	Limit     *float32                                `form:"limit,omitempty" json:"limit,omitempty"`
-	Cursor    *Cursor                                 `form:"cursor,omitempty" json:"cursor,omitempty"`
+// GetListBookmarksParams defines parameters for GetListBookmarks.
+type GetListBookmarksParams struct {
+	// SortOrder Sort order by creation date. Defaults to 'desc'.
+	SortOrder *GetListBookmarksParamsSortOrder `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
 
-	// IncludeContent If set to true, bookmark's content will be included in the response. Note, this content can be large for some bookmarks.
+	// Limit Maximum number of items to return per page.
+	Limit *float32 `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// Cursor Cursor from a previous response to fetch the next page.
+	Cursor *Cursor `form:"cursor,omitempty" json:"cursor,omitempty"`
+
+	// IncludeContent If set to true, the bookmark's full content (HTML, text, etc.) will be included in the response. Set to false for lighter responses when only metadata is needed.
 	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
 }
 
-// GetListsListIdBookmarksParamsSortOrder defines parameters for GetListsListIdBookmarks.
-type GetListsListIdBookmarksParamsSortOrder string
+// GetListBookmarksParamsSortOrder defines parameters for GetListBookmarks.
+type GetListBookmarksParamsSortOrder string
 
-// GetTagsParams defines parameters for GetTags.
-type GetTagsParams struct {
-	NameContains *string                  `form:"nameContains,omitempty" json:"nameContains,omitempty"`
-	Sort         *GetTagsParamsSort       `form:"sort,omitempty" json:"sort,omitempty"`
-	AttachedBy   *GetTagsParamsAttachedBy `form:"attachedBy,omitempty" json:"attachedBy,omitempty"`
-	Cursor       *string                  `form:"cursor,omitempty" json:"cursor,omitempty"`
-	Limit        *float32                 `form:"limit,omitempty" json:"limit,omitempty"`
+// ListTagsParams defines parameters for ListTags.
+type ListTagsParams struct {
+	NameContains *string                   `form:"nameContains,omitempty" json:"nameContains,omitempty"`
+	Sort         *ListTagsParamsSort       `form:"sort,omitempty" json:"sort,omitempty"`
+	AttachedBy   *ListTagsParamsAttachedBy `form:"attachedBy,omitempty" json:"attachedBy,omitempty"`
+	Cursor       *string                   `form:"cursor,omitempty" json:"cursor,omitempty"`
+	Limit        *float32                  `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
-// GetTagsParamsSort defines parameters for GetTags.
-type GetTagsParamsSort string
+// ListTagsParamsSort defines parameters for ListTags.
+type ListTagsParamsSort string
 
-// GetTagsParamsAttachedBy defines parameters for GetTags.
-type GetTagsParamsAttachedBy string
+// ListTagsParamsAttachedBy defines parameters for ListTags.
+type ListTagsParamsAttachedBy string
 
-// PostTagsJSONBody defines parameters for PostTags.
-type PostTagsJSONBody struct {
+// CreateTagJSONBody defines parameters for CreateTag.
+type CreateTagJSONBody struct {
 	Name string `json:"name"`
 }
 
-// PatchTagsTagIdJSONBody defines parameters for PatchTagsTagId.
-type PatchTagsTagIdJSONBody struct {
+// UpdateTagJSONBody defines parameters for UpdateTag.
+type UpdateTagJSONBody struct {
 	Name *string `json:"name,omitempty"`
 }
 
-// GetTagsTagIdBookmarksParams defines parameters for GetTagsTagIdBookmarks.
-type GetTagsTagIdBookmarksParams struct {
-	SortOrder *GetTagsTagIdBookmarksParamsSortOrder `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
-	Limit     *float32                              `form:"limit,omitempty" json:"limit,omitempty"`
-	Cursor    *Cursor                               `form:"cursor,omitempty" json:"cursor,omitempty"`
+// GetTagBookmarksParams defines parameters for GetTagBookmarks.
+type GetTagBookmarksParams struct {
+	// SortOrder Sort order by creation date. Defaults to 'desc'.
+	SortOrder *GetTagBookmarksParamsSortOrder `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
 
-	// IncludeContent If set to true, bookmark's content will be included in the response. Note, this content can be large for some bookmarks.
+	// Limit Maximum number of items to return per page.
+	Limit *float32 `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// Cursor Cursor from a previous response to fetch the next page.
+	Cursor *Cursor `form:"cursor,omitempty" json:"cursor,omitempty"`
+
+	// IncludeContent If set to true, the bookmark's full content (HTML, text, etc.) will be included in the response. Set to false for lighter responses when only metadata is needed.
 	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
 }
 
-// GetTagsTagIdBookmarksParamsSortOrder defines parameters for GetTagsTagIdBookmarks.
-type GetTagsTagIdBookmarksParamsSortOrder string
+// GetTagBookmarksParamsSortOrder defines parameters for GetTagBookmarks.
+type GetTagBookmarksParamsSortOrder string
 
-// PutAdminUsersUserIdJSONRequestBody defines body for PutAdminUsersUserId for application/json ContentType.
-type PutAdminUsersUserIdJSONRequestBody PutAdminUsersUserIdJSONBody
+// AdminTriggerInferenceJSONRequestBody defines body for AdminTriggerInference for application/json ContentType.
+type AdminTriggerInferenceJSONRequestBody AdminTriggerInferenceJSONBody
 
-// PostAssetsMultipartRequestBody defines body for PostAssets for multipart/form-data ContentType.
-type PostAssetsMultipartRequestBody PostAssetsMultipartBody
+// AdminTriggerRecrawlJSONRequestBody defines body for AdminTriggerRecrawl for application/json ContentType.
+type AdminTriggerRecrawlJSONRequestBody AdminTriggerRecrawlJSONBody
 
-// PostBookmarksJSONRequestBody defines body for PostBookmarks for application/json ContentType.
-type PostBookmarksJSONRequestBody PostBookmarksJSONBody
+// AdminUpdateUserJSONRequestBody defines body for AdminUpdateUser for application/json ContentType.
+type AdminUpdateUserJSONRequestBody AdminUpdateUserJSONBody
 
-// PatchBookmarksBookmarkIdJSONRequestBody defines body for PatchBookmarksBookmarkId for application/json ContentType.
-type PatchBookmarksBookmarkIdJSONRequestBody PatchBookmarksBookmarkIdJSONBody
+// UploadAssetMultipartRequestBody defines body for UploadAsset for multipart/form-data ContentType.
+type UploadAssetMultipartRequestBody UploadAssetMultipartBody
 
-// PostBookmarksBookmarkIdAssetsJSONRequestBody defines body for PostBookmarksBookmarkIdAssets for application/json ContentType.
-type PostBookmarksBookmarkIdAssetsJSONRequestBody PostBookmarksBookmarkIdAssetsJSONBody
+// CreateBookmarkJSONRequestBody defines body for CreateBookmark for application/json ContentType.
+type CreateBookmarkJSONRequestBody CreateBookmarkJSONBody
 
-// PutBookmarksBookmarkIdAssetsAssetIdJSONRequestBody defines body for PutBookmarksBookmarkIdAssetsAssetId for application/json ContentType.
-type PutBookmarksBookmarkIdAssetsAssetIdJSONRequestBody PutBookmarksBookmarkIdAssetsAssetIdJSONBody
+// UpdateBookmarkJSONRequestBody defines body for UpdateBookmark for application/json ContentType.
+type UpdateBookmarkJSONRequestBody UpdateBookmarkJSONBody
 
-// DeleteBookmarksBookmarkIdTagsJSONRequestBody defines body for DeleteBookmarksBookmarkIdTags for application/json ContentType.
-type DeleteBookmarksBookmarkIdTagsJSONRequestBody DeleteBookmarksBookmarkIdTagsJSONBody
+// AttachAssetToBookmarkJSONRequestBody defines body for AttachAssetToBookmark for application/json ContentType.
+type AttachAssetToBookmarkJSONRequestBody AttachAssetToBookmarkJSONBody
 
-// PostBookmarksBookmarkIdTagsJSONRequestBody defines body for PostBookmarksBookmarkIdTags for application/json ContentType.
-type PostBookmarksBookmarkIdTagsJSONRequestBody PostBookmarksBookmarkIdTagsJSONBody
+// ReplaceAssetOnBookmarkJSONRequestBody defines body for ReplaceAssetOnBookmark for application/json ContentType.
+type ReplaceAssetOnBookmarkJSONRequestBody ReplaceAssetOnBookmarkJSONBody
 
-// PostHighlightsJSONRequestBody defines body for PostHighlights for application/json ContentType.
-type PostHighlightsJSONRequestBody PostHighlightsJSONBody
+// DetachTagsFromBookmarkJSONRequestBody defines body for DetachTagsFromBookmark for application/json ContentType.
+type DetachTagsFromBookmarkJSONRequestBody DetachTagsFromBookmarkJSONBody
 
-// PatchHighlightsHighlightIdJSONRequestBody defines body for PatchHighlightsHighlightId for application/json ContentType.
-type PatchHighlightsHighlightIdJSONRequestBody PatchHighlightsHighlightIdJSONBody
+// AttachTagsToBookmarkJSONRequestBody defines body for AttachTagsToBookmark for application/json ContentType.
+type AttachTagsToBookmarkJSONRequestBody AttachTagsToBookmarkJSONBody
 
-// PostListsJSONRequestBody defines body for PostLists for application/json ContentType.
-type PostListsJSONRequestBody PostListsJSONBody
+// CreateFeedJSONRequestBody defines body for CreateFeed for application/json ContentType.
+type CreateFeedJSONRequestBody CreateFeedJSONBody
 
-// PatchListsListIdJSONRequestBody defines body for PatchListsListId for application/json ContentType.
-type PatchListsListIdJSONRequestBody PatchListsListIdJSONBody
+// UpdateFeedJSONRequestBody defines body for UpdateFeed for application/json ContentType.
+type UpdateFeedJSONRequestBody UpdateFeedJSONBody
 
-// PostTagsJSONRequestBody defines body for PostTags for application/json ContentType.
-type PostTagsJSONRequestBody PostTagsJSONBody
+// CreateHighlightJSONRequestBody defines body for CreateHighlight for application/json ContentType.
+type CreateHighlightJSONRequestBody CreateHighlightJSONBody
 
-// PatchTagsTagIdJSONRequestBody defines body for PatchTagsTagId for application/json ContentType.
-type PatchTagsTagIdJSONRequestBody PatchTagsTagIdJSONBody
+// UpdateHighlightJSONRequestBody defines body for UpdateHighlight for application/json ContentType.
+type UpdateHighlightJSONRequestBody UpdateHighlightJSONBody
+
+// CreateListJSONRequestBody defines body for CreateList for application/json ContentType.
+type CreateListJSONRequestBody CreateListJSONBody
+
+// UpdateListJSONRequestBody defines body for UpdateList for application/json ContentType.
+type UpdateListJSONRequestBody UpdateListJSONBody
+
+// CreateTagJSONRequestBody defines body for CreateTag for application/json ContentType.
+type CreateTagJSONRequestBody CreateTagJSONBody
+
+// UpdateTagJSONRequestBody defines body for UpdateTag for application/json ContentType.
+type UpdateTagJSONRequestBody UpdateTagJSONBody
 
 // AsBookmarkContent0 returns the union data inside the Bookmark_Content as a BookmarkContent0
 func (t Bookmark_Content) AsBookmarkContent0() (BookmarkContent0, error) {
