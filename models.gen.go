@@ -39,6 +39,23 @@ const (
 	BookmarkContent0CrawlStatusSuccess     BookmarkContent0CrawlStatus = "success"
 )
 
+// Defines values for BookmarkContent0PreferredPreview.
+const (
+	BookmarkContent0PreferredPreviewLessThannil BookmarkContent0PreferredPreview = "<nil>"
+	BookmarkContent0PreferredPreviewOverview    BookmarkContent0PreferredPreview = "overview"
+	BookmarkContent0PreferredPreviewReaderView  BookmarkContent0PreferredPreview = "reader_view"
+	BookmarkContent0PreferredPreviewScreenshot  BookmarkContent0PreferredPreview = "screenshot"
+)
+
+// Defines values for BookmarkContent0ReaderViewStatus.
+const (
+	BookmarkContent0ReaderViewStatusLessThannil BookmarkContent0ReaderViewStatus = "<nil>"
+	BookmarkContent0ReaderViewStatusNotReadable BookmarkContent0ReaderViewStatus = "not_readable"
+	BookmarkContent0ReaderViewStatusReadable    BookmarkContent0ReaderViewStatus = "readable"
+	BookmarkContent0ReaderViewStatusUnavailable BookmarkContent0ReaderViewStatus = "unavailable"
+	BookmarkContent0ReaderViewStatusUncertain   BookmarkContent0ReaderViewStatus = "uncertain"
+)
+
 // Defines values for BookmarkContent0Type.
 const (
 	BookmarkContent0TypeLink BookmarkContent0Type = "link"
@@ -63,6 +80,14 @@ const (
 // Defines values for BookmarkContent3Type.
 const (
 	BookmarkContent3TypeUnknown BookmarkContent3Type = "unknown"
+)
+
+// Defines values for BookmarkEmbeddingStatus.
+const (
+	BookmarkEmbeddingStatusFailure     BookmarkEmbeddingStatus = "failure"
+	BookmarkEmbeddingStatusLessThannil BookmarkEmbeddingStatus = "<nil>"
+	BookmarkEmbeddingStatusPending     BookmarkEmbeddingStatus = "pending"
+	BookmarkEmbeddingStatusSuccess     BookmarkEmbeddingStatus = "success"
 )
 
 // Defines values for BookmarkSource.
@@ -98,6 +123,19 @@ const (
 const (
 	BookmarkTagsAttachedByAi    BookmarkTagsAttachedBy = "ai"
 	BookmarkTagsAttachedByHuman BookmarkTagsAttachedBy = "human"
+)
+
+// Defines values for BookmarkReadableContentBookmarkType.
+const (
+	BookmarkReadableContentBookmarkTypeAsset BookmarkReadableContentBookmarkType = "asset"
+	BookmarkReadableContentBookmarkTypeLink  BookmarkReadableContentBookmarkType = "link"
+	BookmarkReadableContentBookmarkTypeText  BookmarkReadableContentBookmarkType = "text"
+)
+
+// Defines values for BookmarkReadableContentFormat.
+const (
+	BookmarkReadableContentFormatMarkdown BookmarkReadableContentFormat = "markdown"
+	BookmarkReadableContentFormatText     BookmarkReadableContentFormat = "text"
 )
 
 // Defines values for FeedLastFetchedStatus.
@@ -184,7 +222,7 @@ const (
 
 // Defines values for CreateBookmarkJSONBody0Type.
 const (
-	CreateBookmarkJSONBody0TypeLink CreateBookmarkJSONBody0Type = "link"
+	Link CreateBookmarkJSONBody0Type = "link"
 )
 
 // Defines values for CreateBookmarkJSONBody1Type.
@@ -194,13 +232,20 @@ const (
 
 // Defines values for CreateBookmarkJSONBody2AssetType.
 const (
-	Image CreateBookmarkJSONBody2AssetType = "image"
-	Pdf   CreateBookmarkJSONBody2AssetType = "pdf"
+	CreateBookmarkJSONBody2AssetTypeImage CreateBookmarkJSONBody2AssetType = "image"
+	CreateBookmarkJSONBody2AssetTypePdf   CreateBookmarkJSONBody2AssetType = "pdf"
 )
 
 // Defines values for CreateBookmarkJSONBody2Type.
 const (
 	CreateBookmarkJSONBody2TypeAsset CreateBookmarkJSONBody2Type = "asset"
+)
+
+// Defines values for SearchBookmarksParamsSearchMode.
+const (
+	Fts      SearchBookmarksParamsSearchMode = "fts"
+	Hybrid   SearchBookmarksParamsSearchMode = "hybrid"
+	Semantic SearchBookmarksParamsSearchMode = "semantic"
 )
 
 // Defines values for SearchBookmarksParamsSortOrder.
@@ -224,6 +269,12 @@ const (
 	AttachAssetToBookmarkJSONBodyAssetTypeUnknown           AttachAssetToBookmarkJSONBodyAssetType = "unknown"
 	AttachAssetToBookmarkJSONBodyAssetTypeUserUploaded      AttachAssetToBookmarkJSONBodyAssetType = "userUploaded"
 	AttachAssetToBookmarkJSONBodyAssetTypeVideo             AttachAssetToBookmarkJSONBodyAssetType = "video"
+)
+
+// Defines values for GetBookmarkReadableContentParamsFormat.
+const (
+	GetBookmarkReadableContentParamsFormatMarkdown GetBookmarkReadableContentParamsFormat = "markdown"
+	GetBookmarkReadableContentParamsFormatText     GetBookmarkReadableContentParamsFormat = "text"
 )
 
 // Defines values for DetachTagsFromBookmarkJSONBodyTagsAttachedBy.
@@ -302,7 +353,9 @@ type Bookmark struct {
 	} `json:"assets"`
 	Content             Bookmark_Content             `json:"content"`
 	CreatedAt           time.Time                    `json:"createdAt"`
+	EmbeddingStatus     *BookmarkEmbeddingStatus     `json:"embeddingStatus"`
 	Favourited          bool                         `json:"favourited"`
+	FirstCreatedAt      *time.Time                   `json:"firstCreatedAt,omitempty"`
 	Id                  string                       `json:"id"`
 	ModifiedAt          *time.Time                   `json:"modifiedAt"`
 	Note                *string                      `json:"note"`
@@ -324,30 +377,39 @@ type BookmarkAssetsAssetType string
 
 // BookmarkContent0 defines model for .
 type BookmarkContent0 struct {
-	Author                   *string                      `json:"author"`
-	ContentAssetId           *string                      `json:"contentAssetId"`
-	CrawlStatus              *BookmarkContent0CrawlStatus `json:"crawlStatus"`
-	CrawledAt                *time.Time                   `json:"crawledAt"`
-	DateModified             *time.Time                   `json:"dateModified"`
-	DatePublished            *time.Time                   `json:"datePublished"`
-	Description              *string                      `json:"description"`
-	Favicon                  *string                      `json:"favicon"`
-	FullPageArchiveAssetId   *string                      `json:"fullPageArchiveAssetId"`
-	HtmlContent              *string                      `json:"htmlContent"`
-	ImageAssetId             *string                      `json:"imageAssetId"`
-	ImageUrl                 *string                      `json:"imageUrl"`
-	PdfAssetId               *string                      `json:"pdfAssetId"`
-	PrecrawledArchiveAssetId *string                      `json:"precrawledArchiveAssetId"`
-	Publisher                *string                      `json:"publisher"`
-	ScreenshotAssetId        *string                      `json:"screenshotAssetId"`
-	Title                    *string                      `json:"title"`
-	Type                     BookmarkContent0Type         `json:"type"`
-	Url                      string                       `json:"url"`
-	VideoAssetId             *string                      `json:"videoAssetId"`
+	Author                   *string                           `json:"author"`
+	ContentAssetId           *string                           `json:"contentAssetId"`
+	CrawlStatus              *BookmarkContent0CrawlStatus      `json:"crawlStatus"`
+	CrawledAt                *time.Time                        `json:"crawledAt"`
+	DateModified             *time.Time                        `json:"dateModified"`
+	DatePublished            *time.Time                        `json:"datePublished"`
+	Description              *string                           `json:"description"`
+	Favicon                  *string                           `json:"favicon"`
+	FullPageArchiveAssetId   *string                           `json:"fullPageArchiveAssetId"`
+	HtmlContent              *string                           `json:"htmlContent"`
+	ImageAssetId             *string                           `json:"imageAssetId"`
+	ImageUrl                 *string                           `json:"imageUrl"`
+	PdfAssetId               *string                           `json:"pdfAssetId"`
+	PrecrawledArchiveAssetId *string                           `json:"precrawledArchiveAssetId"`
+	PreferredPreview         *BookmarkContent0PreferredPreview `json:"preferredPreview"`
+	Publisher                *string                           `json:"publisher"`
+	ReaderViewScore          *int                              `json:"readerViewScore"`
+	ReaderViewStatus         *BookmarkContent0ReaderViewStatus `json:"readerViewStatus"`
+	ScreenshotAssetId        *string                           `json:"screenshotAssetId"`
+	Title                    *string                           `json:"title"`
+	Type                     BookmarkContent0Type              `json:"type"`
+	Url                      string                            `json:"url"`
+	VideoAssetId             *string                           `json:"videoAssetId"`
 }
 
 // BookmarkContent0CrawlStatus defines model for Bookmark.Content.0.CrawlStatus.
 type BookmarkContent0CrawlStatus string
+
+// BookmarkContent0PreferredPreview defines model for Bookmark.Content.0.PreferredPreview.
+type BookmarkContent0PreferredPreview string
+
+// BookmarkContent0ReaderViewStatus defines model for Bookmark.Content.0.ReaderViewStatus.
+type BookmarkContent0ReaderViewStatus string
 
 // BookmarkContent0Type defines model for Bookmark.Content.0.Type.
 type BookmarkContent0Type string
@@ -392,6 +454,9 @@ type Bookmark_Content struct {
 	union json.RawMessage
 }
 
+// BookmarkEmbeddingStatus defines model for Bookmark.EmbeddingStatus.
+type BookmarkEmbeddingStatus string
+
 // BookmarkSource defines model for Bookmark.Source.
 type BookmarkSource string
 
@@ -406,6 +471,39 @@ type BookmarkTagsAttachedBy string
 
 // BookmarkId The unique identifier of the bookmark.
 type BookmarkId = string
+
+// BookmarkReadableContent defines model for BookmarkReadableContent.
+type BookmarkReadableContent struct {
+	BookmarkId   string                              `json:"bookmarkId"`
+	BookmarkType BookmarkReadableContentBookmarkType `json:"bookmarkType"`
+	Content      string                              `json:"content"`
+
+	// ContentVersion A hash identifying the rendered content version used by this cursor.
+	ContentVersion string                        `json:"contentVersion"`
+	Format         BookmarkReadableContentFormat `json:"format"`
+
+	// NextCursor Cursor for the next chunk, or null when all content has been returned.
+	NextCursor *string `json:"nextCursor"`
+	Range      struct {
+		// End Zero-based end offset in Unicode characters, exclusive.
+		End int `json:"end"`
+
+		// Start Zero-based start offset in Unicode characters, inclusive.
+		Start int `json:"start"`
+
+		// Total Total number of Unicode characters in the rendered content.
+		Total int `json:"total"`
+	} `json:"range"`
+
+	// Truncated Whether more readable content remains after this chunk.
+	Truncated bool `json:"truncated"`
+}
+
+// BookmarkReadableContentBookmarkType defines model for BookmarkReadableContent.BookmarkType.
+type BookmarkReadableContentBookmarkType string
+
+// BookmarkReadableContentFormat defines model for BookmarkReadableContent.Format.
+type BookmarkReadableContentFormat string
 
 // Cursor Cursor from a previous response to fetch the next page.
 type Cursor = string
@@ -499,6 +597,18 @@ type PaginatedHighlights struct {
 	NextCursor *string `json:"nextCursor"`
 }
 
+// SignedAssetUrl defines model for SignedAssetUrl.
+type SignedAssetUrl struct {
+	// AssetId The unique identifier of the asset.
+	AssetId string `json:"assetId"`
+
+	// ExpiresAt When the signed URL expires, in ISO 8601 format.
+	ExpiresAt time.Time `json:"expiresAt"`
+
+	// SignedUrl The temporary URL for downloading the asset.
+	SignedUrl string `json:"signedUrl"`
+}
+
 // Tag defines model for Tag.
 type Tag struct {
 	Id                         string  `json:"id"`
@@ -530,6 +640,9 @@ type UploadedAsset struct {
 
 // AdminTriggerInferenceJSONBody defines parameters for AdminTriggerInference.
 type AdminTriggerInferenceJSONBody struct {
+	// ModifiedWithinSeconds Only process bookmarks modified within this many seconds. Omit to process all matching bookmarks.
+	ModifiedWithinSeconds *int `json:"modifiedWithinSeconds,omitempty"`
+
 	// Status Filter bookmarks by their inference status. Use 'failure' to retry only failed ones.
 	Status *AdminTriggerInferenceJSONBodyStatus `json:"status,omitempty"`
 
@@ -548,12 +661,21 @@ type AdminTriggerRecrawlJSONBody struct {
 	// CrawlStatus Filter bookmarks by their crawl status. Use 'failure' to retry only failed crawls.
 	CrawlStatus *AdminTriggerRecrawlJSONBodyCrawlStatus `json:"crawlStatus,omitempty"`
 
+	// ModifiedWithinSeconds Only process bookmarks modified within this many seconds. Omit to process all matching bookmarks.
+	ModifiedWithinSeconds *int `json:"modifiedWithinSeconds,omitempty"`
+
 	// RunInference Whether to run AI inference after crawling.
 	RunInference *bool `json:"runInference,omitempty"`
 }
 
 // AdminTriggerRecrawlJSONBodyCrawlStatus defines parameters for AdminTriggerRecrawl.
 type AdminTriggerRecrawlJSONBodyCrawlStatus string
+
+// AdminTriggerReindexJSONBody defines parameters for AdminTriggerReindex.
+type AdminTriggerReindexJSONBody struct {
+	// ModifiedWithinSeconds Only process bookmarks modified within this many seconds. Omit to process all matching bookmarks.
+	ModifiedWithinSeconds *int `json:"modifiedWithinSeconds,omitempty"`
+}
 
 // AdminUpdateUserJSONBody defines parameters for AdminUpdateUser.
 type AdminUpdateUserJSONBody struct {
@@ -662,6 +784,9 @@ type SearchBookmarksParams struct {
 	// Q The search query string.
 	Q string `form:"q" json:"q"`
 
+	// SearchMode Search strategy. 'fts' uses full-text search, 'semantic' uses bookmark embeddings, and 'hybrid' fuses a fixed candidate window from both. Hybrid falls back to full-text search when the query contains no free-text terms or when embedding infrastructure is unavailable. Semantic hits below a minimum similarity are dropped, so semantic search may return fewer results than requested.
+	SearchMode *SearchBookmarksParamsSearchMode `form:"searchMode,omitempty" json:"searchMode,omitempty"`
+
 	// SortOrder Sort order for results. Defaults to 'relevance'. Use 'asc' or 'desc' for date-based sorting.
 	SortOrder *SearchBookmarksParamsSortOrder `form:"sortOrder,omitempty" json:"sortOrder,omitempty"`
 
@@ -674,6 +799,9 @@ type SearchBookmarksParams struct {
 	// IncludeContent If set to true, the bookmark's full content (HTML, text, etc.) will be included in the response. Set to false for lighter responses when only metadata is needed.
 	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
 }
+
+// SearchBookmarksParamsSearchMode defines parameters for SearchBookmarks.
+type SearchBookmarksParamsSearchMode string
 
 // SearchBookmarksParamsSortOrder defines parameters for SearchBookmarks.
 type SearchBookmarksParamsSortOrder string
@@ -719,6 +847,21 @@ type ReplaceAssetOnBookmarkJSONBody struct {
 	// AssetId The ID of the new asset to use as a replacement.
 	AssetId string `json:"assetId"`
 }
+
+// GetBookmarkReadableContentParams defines parameters for GetBookmarkReadableContent.
+type GetBookmarkReadableContentParams struct {
+	// Format The readable representation. If omitted with a cursor, the cursor's format is used; otherwise defaults to markdown.
+	Format *GetBookmarkReadableContentParamsFormat `form:"format,omitempty" json:"format,omitempty"`
+
+	// MaxChars Maximum number of Unicode characters to return. The chunk may end earlier at a paragraph or line boundary.
+	MaxChars *int `form:"maxChars,omitempty" json:"maxChars,omitempty"`
+
+	// Cursor Opaque continuation cursor returned as `nextCursor` by a previous response.
+	Cursor *string `form:"cursor,omitempty" json:"cursor,omitempty"`
+}
+
+// GetBookmarkReadableContentParamsFormat defines parameters for GetBookmarkReadableContent.
+type GetBookmarkReadableContentParamsFormat string
 
 // DetachTagsFromBookmarkJSONBody defines parameters for DetachTagsFromBookmark.
 type DetachTagsFromBookmarkJSONBody struct {
@@ -880,6 +1023,9 @@ type AdminTriggerInferenceJSONRequestBody AdminTriggerInferenceJSONBody
 
 // AdminTriggerRecrawlJSONRequestBody defines body for AdminTriggerRecrawl for application/json ContentType.
 type AdminTriggerRecrawlJSONRequestBody AdminTriggerRecrawlJSONBody
+
+// AdminTriggerReindexJSONRequestBody defines body for AdminTriggerReindex for application/json ContentType.
+type AdminTriggerReindexJSONRequestBody AdminTriggerReindexJSONBody
 
 // AdminUpdateUserJSONRequestBody defines body for AdminUpdateUser for application/json ContentType.
 type AdminUpdateUserJSONRequestBody AdminUpdateUserJSONBody
