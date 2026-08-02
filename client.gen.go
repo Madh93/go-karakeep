@@ -100,8 +100,10 @@ type ClientInterface interface {
 
 	AdminTriggerRecrawl(ctx context.Context, body AdminTriggerRecrawlJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// AdminTriggerReindex request
-	AdminTriggerReindex(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// AdminTriggerReindexWithBody request with any body
+	AdminTriggerReindexWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AdminTriggerReindex(ctx context.Context, body AdminTriggerReindexJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AdminUpdateUserWithBody request with any body
 	AdminUpdateUserWithBody(ctx context.Context, userId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -113,6 +115,9 @@ type ClientInterface interface {
 
 	// GetAsset request
 	GetAsset(ctx context.Context, assetId AssetId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetAssetSignedUrl request
+	GetAssetSignedUrl(ctx context.Context, assetId AssetId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListBackups request
 	ListBackups(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -166,6 +171,9 @@ type ClientInterface interface {
 	ReplaceAssetOnBookmarkWithBody(ctx context.Context, bookmarkId BookmarkId, assetId AssetId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	ReplaceAssetOnBookmark(ctx context.Context, bookmarkId BookmarkId, assetId AssetId, body ReplaceAssetOnBookmarkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetBookmarkReadableContent request
+	GetBookmarkReadableContent(ctx context.Context, bookmarkId BookmarkId, params *GetBookmarkReadableContentParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetBookmarkHighlights request
 	GetBookmarkHighlights(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -332,8 +340,20 @@ func (c *Client) AdminTriggerRecrawl(ctx context.Context, body AdminTriggerRecra
 	return c.Client.Do(req)
 }
 
-func (c *Client) AdminTriggerReindex(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAdminTriggerReindexRequest(c.Server)
+func (c *Client) AdminTriggerReindexWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminTriggerReindexRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminTriggerReindex(ctx context.Context, body AdminTriggerReindexJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminTriggerReindexRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -382,6 +402,18 @@ func (c *Client) UploadAssetWithBody(ctx context.Context, contentType string, bo
 
 func (c *Client) GetAsset(ctx context.Context, assetId AssetId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetAssetRequest(c.Server, assetId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetAssetSignedUrl(ctx context.Context, assetId AssetId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetAssetSignedUrlRequest(c.Server, assetId)
 	if err != nil {
 		return nil, err
 	}
@@ -610,6 +642,18 @@ func (c *Client) ReplaceAssetOnBookmarkWithBody(ctx context.Context, bookmarkId 
 
 func (c *Client) ReplaceAssetOnBookmark(ctx context.Context, bookmarkId BookmarkId, assetId AssetId, body ReplaceAssetOnBookmarkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReplaceAssetOnBookmarkRequest(c.Server, bookmarkId, assetId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetBookmarkReadableContent(ctx context.Context, bookmarkId BookmarkId, params *GetBookmarkReadableContentParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetBookmarkReadableContentRequest(c.Server, bookmarkId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1204,8 +1248,19 @@ func NewAdminTriggerRecrawlRequestWithBody(server string, contentType string, bo
 	return req, nil
 }
 
-// NewAdminTriggerReindexRequest generates requests for AdminTriggerReindex
-func NewAdminTriggerReindexRequest(server string) (*http.Request, error) {
+// NewAdminTriggerReindexRequest calls the generic AdminTriggerReindex builder with application/json body
+func NewAdminTriggerReindexRequest(server string, body AdminTriggerReindexJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAdminTriggerReindexRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewAdminTriggerReindexRequestWithBody generates requests for AdminTriggerReindex with any type of body
+func NewAdminTriggerReindexRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1223,10 +1278,12 @@ func NewAdminTriggerReindexRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	req, err := http.NewRequest("POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -1324,6 +1381,40 @@ func NewGetAssetRequest(server string, assetId AssetId) (*http.Request, error) {
 	}
 
 	operationPath := fmt.Sprintf("/assets/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetAssetSignedUrlRequest generates requests for GetAssetSignedUrl
+func NewGetAssetSignedUrlRequest(server string, assetId AssetId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "assetId", runtime.ParamLocationPath, assetId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/assets/%s/signed-url", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1745,6 +1836,22 @@ func NewSearchBookmarksRequest(server string, params *SearchBookmarksParams) (*h
 			}
 		}
 
+		if params.SearchMode != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "searchMode", runtime.ParamLocationQuery, *params.SearchMode); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
 		if params.SortOrder != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sortOrder", runtime.ParamLocationQuery, *params.SortOrder); err != nil {
@@ -2095,6 +2202,94 @@ func NewReplaceAssetOnBookmarkRequestWithBody(server string, bookmarkId Bookmark
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetBookmarkReadableContentRequest generates requests for GetBookmarkReadableContent
+func NewGetBookmarkReadableContentRequest(server string, bookmarkId BookmarkId, params *GetBookmarkReadableContentParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "bookmarkId", runtime.ParamLocationPath, bookmarkId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/bookmarks/%s/content", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Format != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "format", runtime.ParamLocationQuery, *params.Format); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.MaxChars != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "maxChars", runtime.ParamLocationQuery, *params.MaxChars); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Cursor != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "cursor", runtime.ParamLocationQuery, *params.Cursor); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -3578,8 +3773,10 @@ type ClientWithResponsesInterface interface {
 
 	AdminTriggerRecrawlWithResponse(ctx context.Context, body AdminTriggerRecrawlJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminTriggerRecrawlResponse, error)
 
-	// AdminTriggerReindexWithResponse request
-	AdminTriggerReindexWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AdminTriggerReindexResponse, error)
+	// AdminTriggerReindexWithBodyWithResponse request with any body
+	AdminTriggerReindexWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminTriggerReindexResponse, error)
+
+	AdminTriggerReindexWithResponse(ctx context.Context, body AdminTriggerReindexJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminTriggerReindexResponse, error)
 
 	// AdminUpdateUserWithBodyWithResponse request with any body
 	AdminUpdateUserWithBodyWithResponse(ctx context.Context, userId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminUpdateUserResponse, error)
@@ -3591,6 +3788,9 @@ type ClientWithResponsesInterface interface {
 
 	// GetAssetWithResponse request
 	GetAssetWithResponse(ctx context.Context, assetId AssetId, reqEditors ...RequestEditorFn) (*GetAssetResponse, error)
+
+	// GetAssetSignedUrlWithResponse request
+	GetAssetSignedUrlWithResponse(ctx context.Context, assetId AssetId, reqEditors ...RequestEditorFn) (*GetAssetSignedUrlResponse, error)
 
 	// ListBackupsWithResponse request
 	ListBackupsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListBackupsResponse, error)
@@ -3644,6 +3844,9 @@ type ClientWithResponsesInterface interface {
 	ReplaceAssetOnBookmarkWithBodyWithResponse(ctx context.Context, bookmarkId BookmarkId, assetId AssetId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceAssetOnBookmarkResponse, error)
 
 	ReplaceAssetOnBookmarkWithResponse(ctx context.Context, bookmarkId BookmarkId, assetId AssetId, body ReplaceAssetOnBookmarkJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceAssetOnBookmarkResponse, error)
+
+	// GetBookmarkReadableContentWithResponse request
+	GetBookmarkReadableContentWithResponse(ctx context.Context, bookmarkId BookmarkId, params *GetBookmarkReadableContentParams, reqEditors ...RequestEditorFn) (*GetBookmarkReadableContentResponse, error)
 
 	// GetBookmarkHighlightsWithResponse request
 	GetBookmarkHighlightsWithResponse(ctx context.Context, bookmarkId BookmarkId, reqEditors ...RequestEditorFn) (*GetBookmarkHighlightsResponse, error)
@@ -3907,6 +4110,28 @@ func (r GetAssetResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r GetAssetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetAssetSignedUrlResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SignedAssetUrl
+}
+
+// Status returns HTTPResponse.Status
+func (r GetAssetSignedUrlResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetAssetSignedUrlResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -4200,7 +4425,9 @@ type UpdateBookmarkResponse struct {
 	JSON200      *struct {
 		Archived            bool                                  `json:"archived"`
 		CreatedAt           time.Time                             `json:"createdAt"`
+		EmbeddingStatus     *UpdateBookmark200EmbeddingStatus     `json:"embeddingStatus"`
 		Favourited          bool                                  `json:"favourited"`
+		FirstCreatedAt      *time.Time                            `json:"firstCreatedAt,omitempty"`
 		Id                  string                                `json:"id"`
 		ModifiedAt          *time.Time                            `json:"modifiedAt"`
 		Note                *string                               `json:"note"`
@@ -4213,6 +4440,7 @@ type UpdateBookmarkResponse struct {
 	}
 	JSON404 *Error
 }
+type UpdateBookmark200EmbeddingStatus string
 type UpdateBookmark200Source string
 type UpdateBookmark200SummarizationStatus string
 type UpdateBookmark200TaggingStatus string
@@ -4305,6 +4533,31 @@ func (r ReplaceAssetOnBookmarkResponse) StatusCode() int {
 	return 0
 }
 
+type GetBookmarkReadableContentResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *BookmarkReadableContent
+	JSON400      *Error
+	JSON404      *Error
+	JSON409      *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetBookmarkReadableContentResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetBookmarkReadableContentResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type GetBookmarkHighlightsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -4361,7 +4614,9 @@ type SummarizeBookmarkResponse struct {
 	JSON200      *struct {
 		Archived            bool                                     `json:"archived"`
 		CreatedAt           time.Time                                `json:"createdAt"`
+		EmbeddingStatus     *SummarizeBookmark200EmbeddingStatus     `json:"embeddingStatus"`
 		Favourited          bool                                     `json:"favourited"`
+		FirstCreatedAt      *time.Time                               `json:"firstCreatedAt,omitempty"`
 		Id                  string                                   `json:"id"`
 		ModifiedAt          *time.Time                               `json:"modifiedAt"`
 		Note                *string                                  `json:"note"`
@@ -4374,6 +4629,7 @@ type SummarizeBookmarkResponse struct {
 	}
 	JSON404 *Error
 }
+type SummarizeBookmark200EmbeddingStatus string
 type SummarizeBookmark200Source string
 type SummarizeBookmark200SummarizationStatus string
 type SummarizeBookmark200TaggingStatus string
@@ -5152,9 +5408,17 @@ func (c *ClientWithResponses) AdminTriggerRecrawlWithResponse(ctx context.Contex
 	return ParseAdminTriggerRecrawlResponse(rsp)
 }
 
-// AdminTriggerReindexWithResponse request returning *AdminTriggerReindexResponse
-func (c *ClientWithResponses) AdminTriggerReindexWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AdminTriggerReindexResponse, error) {
-	rsp, err := c.AdminTriggerReindex(ctx, reqEditors...)
+// AdminTriggerReindexWithBodyWithResponse request with arbitrary body returning *AdminTriggerReindexResponse
+func (c *ClientWithResponses) AdminTriggerReindexWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminTriggerReindexResponse, error) {
+	rsp, err := c.AdminTriggerReindexWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminTriggerReindexResponse(rsp)
+}
+
+func (c *ClientWithResponses) AdminTriggerReindexWithResponse(ctx context.Context, body AdminTriggerReindexJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminTriggerReindexResponse, error) {
+	rsp, err := c.AdminTriggerReindex(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -5194,6 +5458,15 @@ func (c *ClientWithResponses) GetAssetWithResponse(ctx context.Context, assetId 
 		return nil, err
 	}
 	return ParseGetAssetResponse(rsp)
+}
+
+// GetAssetSignedUrlWithResponse request returning *GetAssetSignedUrlResponse
+func (c *ClientWithResponses) GetAssetSignedUrlWithResponse(ctx context.Context, assetId AssetId, reqEditors ...RequestEditorFn) (*GetAssetSignedUrlResponse, error) {
+	rsp, err := c.GetAssetSignedUrl(ctx, assetId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetAssetSignedUrlResponse(rsp)
 }
 
 // ListBackupsWithResponse request returning *ListBackupsResponse
@@ -5361,6 +5634,15 @@ func (c *ClientWithResponses) ReplaceAssetOnBookmarkWithResponse(ctx context.Con
 		return nil, err
 	}
 	return ParseReplaceAssetOnBookmarkResponse(rsp)
+}
+
+// GetBookmarkReadableContentWithResponse request returning *GetBookmarkReadableContentResponse
+func (c *ClientWithResponses) GetBookmarkReadableContentWithResponse(ctx context.Context, bookmarkId BookmarkId, params *GetBookmarkReadableContentParams, reqEditors ...RequestEditorFn) (*GetBookmarkReadableContentResponse, error) {
+	rsp, err := c.GetBookmarkReadableContent(ctx, bookmarkId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetBookmarkReadableContentResponse(rsp)
 }
 
 // GetBookmarkHighlightsWithResponse request returning *GetBookmarkHighlightsResponse
@@ -5945,6 +6227,32 @@ func ParseGetAssetResponse(rsp *http.Response) (*GetAssetResponse, error) {
 	return response, nil
 }
 
+// ParseGetAssetSignedUrlResponse parses an HTTP response from a GetAssetSignedUrlWithResponse call
+func ParseGetAssetSignedUrlResponse(rsp *http.Response) (*GetAssetSignedUrlResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetAssetSignedUrlResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SignedAssetUrl
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseListBackupsResponse parses an HTTP response from a ListBackupsWithResponse call
 func ParseListBackupsResponse(rsp *http.Response) (*ListBackupsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -6309,7 +6617,9 @@ func ParseUpdateBookmarkResponse(rsp *http.Response) (*UpdateBookmarkResponse, e
 		var dest struct {
 			Archived            bool                                  `json:"archived"`
 			CreatedAt           time.Time                             `json:"createdAt"`
+			EmbeddingStatus     *UpdateBookmark200EmbeddingStatus     `json:"embeddingStatus"`
 			Favourited          bool                                  `json:"favourited"`
+			FirstCreatedAt      *time.Time                            `json:"firstCreatedAt,omitempty"`
 			Id                  string                                `json:"id"`
 			ModifiedAt          *time.Time                            `json:"modifiedAt"`
 			Note                *string                               `json:"note"`
@@ -6426,6 +6736,53 @@ func ParseReplaceAssetOnBookmarkResponse(rsp *http.Response) (*ReplaceAssetOnBoo
 	return response, nil
 }
 
+// ParseGetBookmarkReadableContentResponse parses an HTTP response from a GetBookmarkReadableContentWithResponse call
+func ParseGetBookmarkReadableContentResponse(rsp *http.Response) (*GetBookmarkReadableContentResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetBookmarkReadableContentResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest BookmarkReadableContent
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON409 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseGetBookmarkHighlightsResponse parses an HTTP response from a GetBookmarkHighlightsWithResponse call
 func ParseGetBookmarkHighlightsResponse(rsp *http.Response) (*GetBookmarkHighlightsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -6514,7 +6871,9 @@ func ParseSummarizeBookmarkResponse(rsp *http.Response) (*SummarizeBookmarkRespo
 		var dest struct {
 			Archived            bool                                     `json:"archived"`
 			CreatedAt           time.Time                                `json:"createdAt"`
+			EmbeddingStatus     *SummarizeBookmark200EmbeddingStatus     `json:"embeddingStatus"`
 			Favourited          bool                                     `json:"favourited"`
+			FirstCreatedAt      *time.Time                               `json:"firstCreatedAt,omitempty"`
 			Id                  string                                   `json:"id"`
 			ModifiedAt          *time.Time                               `json:"modifiedAt"`
 			Note                *string                                  `json:"note"`
