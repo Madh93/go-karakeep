@@ -981,7 +981,7 @@ type ListTagsParams struct {
 	Sort         *ListTagsParamsSort       `form:"sort,omitempty" json:"sort,omitempty"`
 	AttachedBy   *ListTagsParamsAttachedBy `form:"attachedBy,omitempty" json:"attachedBy,omitempty"`
 	Cursor       *string                   `form:"cursor,omitempty" json:"cursor,omitempty"`
-	Limit        *float32                  `form:"limit,omitempty" json:"limit,omitempty"`
+	Limit        *int                      `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
 // ListTagsParamsSort defines parameters for ListTags.
