@@ -154,6 +154,14 @@ const (
 	HighlightColorYellow HighlightColor = "yellow"
 )
 
+// Defines values for HighlightWithBookmarkColor.
+const (
+	HighlightWithBookmarkColorBlue   HighlightWithBookmarkColor = "blue"
+	HighlightWithBookmarkColorGreen  HighlightWithBookmarkColor = "green"
+	HighlightWithBookmarkColorRed    HighlightWithBookmarkColor = "red"
+	HighlightWithBookmarkColorYellow HighlightWithBookmarkColor = "yellow"
+)
+
 // Defines values for ListType.
 const (
 	ListTypeManual ListType = "manual"
@@ -299,10 +307,10 @@ const (
 
 // Defines values for UpdateHighlightJSONBodyColor.
 const (
-	Blue   UpdateHighlightJSONBodyColor = "blue"
-	Green  UpdateHighlightJSONBodyColor = "green"
-	Red    UpdateHighlightJSONBodyColor = "red"
-	Yellow UpdateHighlightJSONBodyColor = "yellow"
+	UpdateHighlightJSONBodyColorBlue   UpdateHighlightJSONBodyColor = "blue"
+	UpdateHighlightJSONBodyColorGreen  UpdateHighlightJSONBodyColor = "green"
+	UpdateHighlightJSONBodyColorRed    UpdateHighlightJSONBodyColor = "red"
+	UpdateHighlightJSONBodyColorYellow UpdateHighlightJSONBodyColor = "yellow"
 )
 
 // Defines values for CreateListJSONBodyType.
@@ -350,6 +358,7 @@ type Bookmark struct {
 		AssetType BookmarkAssetsAssetType `json:"assetType"`
 		FileName  *string                 `json:"fileName"`
 		Id        string                  `json:"id"`
+		Size      *float32                `json:"size"`
 	} `json:"assets"`
 	Content             Bookmark_Content             `json:"content"`
 	CreatedAt           time.Time                    `json:"createdAt"`
@@ -547,7 +556,9 @@ type Highlight struct {
 	EndOffset   float32         `json:"endOffset"`
 	Id          string          `json:"id"`
 	Note        *string         `json:"note"`
+	Prefix      *string         `json:"prefix"`
 	StartOffset float32         `json:"startOffset"`
+	Suffix      *string         `json:"suffix"`
 	Text        *string         `json:"text"`
 	UserId      string          `json:"userId"`
 }
@@ -557,6 +568,28 @@ type HighlightColor string
 
 // HighlightId The unique identifier of the highlight.
 type HighlightId = string
+
+// HighlightWithBookmark defines model for HighlightWithBookmark.
+type HighlightWithBookmark struct {
+	Bookmark struct {
+		Title *string `json:"title"`
+		Url   *string `json:"url"`
+	} `json:"bookmark"`
+	BookmarkId  string                      `json:"bookmarkId"`
+	Color       *HighlightWithBookmarkColor `json:"color,omitempty"`
+	CreatedAt   time.Time                   `json:"createdAt"`
+	EndOffset   float32                     `json:"endOffset"`
+	Id          string                      `json:"id"`
+	Note        *string                     `json:"note"`
+	Prefix      *string                     `json:"prefix"`
+	StartOffset float32                     `json:"startOffset"`
+	Suffix      *string                     `json:"suffix"`
+	Text        *string                     `json:"text"`
+	UserId      string                      `json:"userId"`
+}
+
+// HighlightWithBookmarkColor defines model for HighlightWithBookmark.Color.
+type HighlightWithBookmarkColor string
 
 // List defines model for List.
 type List struct {
@@ -591,7 +624,7 @@ type PaginatedBookmarks struct {
 
 // PaginatedHighlights defines model for PaginatedHighlights.
 type PaginatedHighlights struct {
-	Highlights []Highlight `json:"highlights"`
+	Highlights []HighlightWithBookmark `json:"highlights"`
 
 	// NextCursor Cursor for the next page, or null if no more results.
 	NextCursor *string `json:"nextCursor"`
@@ -918,7 +951,9 @@ type CreateHighlightJSONBody struct {
 	Color       *CreateHighlightJSONBodyColor `json:"color,omitempty"`
 	EndOffset   float32                       `json:"endOffset"`
 	Note        *string                       `json:"note"`
+	Prefix      *string                       `json:"prefix"`
 	StartOffset float32                       `json:"startOffset"`
+	Suffix      *string                       `json:"suffix"`
 	Text        *string                       `json:"text"`
 }
 

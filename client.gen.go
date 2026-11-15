@@ -4468,6 +4468,7 @@ type AttachAssetToBookmarkResponse struct {
 		AssetType AttachAssetToBookmark201AssetType `json:"assetType"`
 		FileName  *string                           `json:"fileName"`
 		Id        string                            `json:"id"`
+		Size      *float32                          `json:"size"`
 	}
 	JSON404 *Error
 }
@@ -6666,6 +6667,7 @@ func ParseAttachAssetToBookmarkResponse(rsp *http.Response) (*AttachAssetToBookm
 			AssetType AttachAssetToBookmark201AssetType `json:"assetType"`
 			FileName  *string                           `json:"fileName"`
 			Id        string                            `json:"id"`
+			Size      *float32                          `json:"size"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
